@@ -83,8 +83,8 @@ DELETE /stocks/{id}
 1. Clone o repositório: `git clone https://github.com/izaiasmachado/mandacarubroker.git`
 2. Siga o tutorial para [criar seu arquivo `.env` e subir um banco PostgreSQL](./docs/tutorials/setup-postgresql-docker-compose.md)
 3. Importe o projeto em sua IDE preferida **(caso use o IntelliJ):** [realize o tutorial para setar variáveis de ambiente](./docs/tutorials/setup-dotenv-variables-intellij.md) e também [configure o CheckStyle](./docs/tutorials/setup-checkstyle-plugin-intellij.md)
-4. Execute o aplicativo Spring Boot.
-5. Acesse a API em `http://localhost:8080`.
+4. Execute o aplicativo Spring Boot
+5. Acesse a API em `http://localhost:8080`
 
 ## Requisitos
 
