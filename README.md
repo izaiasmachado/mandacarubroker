@@ -1,14 +1,17 @@
-# MandaCaru Broker API
+# Mandacaru Broker - API
 
 ## Descrição
-A Mandacaru Broker API é uma aplicação Spring Boot que fornece operações CRUD (Create, Read, Update, Delete) para gerenciar informações sobre ações (stocks).
+
+O projeto Mandacaru Broker API é uma aplicação Spring Boot que fornece operações CRUD (Create, Read, Update, Delete) para gerenciar informações sobre ações (stocks).
 
 ## Recursos
 
 ### Listar Todas as Ações
+
 Retorna uma lista de todas as ações disponíveis.
 
 **Endpoint:**
+
 ```http
 GET /stocks
 ```
@@ -18,17 +21,21 @@ GET /stocks
 Retorna os detalhes de uma ação específica com base no ID.
 
 **Endpoint:**
+
 ```http
 GET /stocks/{id}
 ```
 
 ### Criar uma Nova Ação
+
 Cria uma nova ação com base nos dados fornecidos.
 
 **Endpoint:**
+
 ```http
 POST /stocks
 ```
+
 **Corpo da Solicitação (Request Body):**
 
 ```JSON
@@ -39,13 +46,17 @@ POST /stocks
 }
 
 ```
+
 ### Atualizar uma Ação por ID
+
 Atualiza os detalhes de uma ação específica com base no ID.
 
 **Endpoint:**
+
 ```http
 PUT /stocks/{id}
 ```
+
 **Corpo da Solicitação (Request Body):**
 
 ```JSON
@@ -58,35 +69,41 @@ PUT /stocks/{id}
 ```
 
 ### Excluir uma Ação por ID
+
 Exclui uma ação específica com base no ID.
 
 **Endpoint:**
+
 ```http
 DELETE /stocks/{id}
 ```
 
-
 ## Uso
+
 1. Clone o repositório: `git clone https://github.com/seu-usuario/MandaCaruBrokerAPI.git`
-2. Importe o projeto em sua IDE preferida.
-3. Configure o banco de dados e as propriedades de aplicação conforme necessário.
+2. [Crie seu arquivo `.env` e suba um banco PostgreSQL](./docs/tutorials/setup-postgresql-docker-compose.md)
+3. Importe o projeto em sua IDE preferida **(caso use o IntelliJ):** [realize o tutorial para setar variáveis de ambiente](./docs/tutorials/setup-dotenv-variables-intellij.md) e também [configure o CheckStyle](./docs/tutorials/setup-checkstyle-plugin-intellij.md)
 4. Execute o aplicativo Spring Boot.
 5. Acesse a API em `http://localhost:8080`.
 
 ## Requisitos
-- Java 11 ou superior
+
+- Java 17 ou superior
 - Maven
-- Banco de dados
+- Docker (Opcional para subir o banco de dados)
 
 ## Tecnologias Utilizadas
+
 - Spring Boot
 - Spring Data JPA
+- Srpint Boot Tests
 - Maven
 - PostgreSQL
 
 ## Contribuições
+
 Contribuições são bem-vindas!
 
 ## Licença
-Este projeto está licenciado sob a [Licença MIT](LICENSE).
 
+Este projeto está licenciado sob a [Licença MIT](LICENSE).
