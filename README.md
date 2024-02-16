@@ -94,10 +94,9 @@ DELETE /stocks/{id}
 
 ## Tecnologias Utilizadas
 
-- Spring Boot
-- Spring Data JPA
-- Srpint Boot Tests
 - Maven
+- Spring Boot
+- JUnit5
 - PostgreSQL
 
 ## Contribuições
