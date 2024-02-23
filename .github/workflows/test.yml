@@ -1,19 +1,13 @@
+name: Run test suites
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - main
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Run Checkstyle
-        run: mvn checkstyle:check -Dcheckstyle.config.location=config/checkstyle.xml -DconsoleOutput=True -DfailOnViolation=True
-
   test:
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK

@@ -1,0 +1,17 @@
+name: Check linting
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Check linting with CheckStyle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run Checkstyle
+        run: mvn checkstyle:check -Dcheckstyle.config.location=config/checkstyle.xml -DconsoleOutput=True -DfailOnViolation=True
