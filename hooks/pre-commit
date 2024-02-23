@@ -17,3 +17,13 @@ for file in $staged_files; do
         exit 1
     fi
 done
+
+# Run unit tests
+mvn test
+
+# Check if the tests passed
+status=$?
+if [ $status -ne 0 ]; then
+    echo "Unit tests failed. Please fix them before committing."
+    exit 1
+fi
