@@ -28,7 +28,7 @@ import java.util.Optional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class StockControllerTest {
+class StockControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
