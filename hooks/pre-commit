@@ -5,6 +5,10 @@ staged_files=$(git diff --staged --name-only)
 
 # Run Checkstyle only on staged files
 for file in $staged_files; do
+    if [[ $file != *.java ]]; then
+        continue
+    fi
+
     echo "Running Checkstyle on $file"
 
     # Run Checkstyle on the staged file
