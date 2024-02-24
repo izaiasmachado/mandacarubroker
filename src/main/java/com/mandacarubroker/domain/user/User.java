@@ -24,4 +24,14 @@ public class User {
     private String lastName;
     private LocalDate birthDate;
     private double balance;
+
+    public User(final RequestUserDTO requestUserDTO) {
+        this.email = requestUserDTO.email();
+        this.username = requestUserDTO.username();
+        this.password = requestUserDTO.password();
+        this.firstName = requestUserDTO.firstName();
+        this.lastName = requestUserDTO.lastName();
+        this.birthDate = requestUserDTO.birthDate();
+        this.balance = requestUserDTO.balance();
+    }
 }
