@@ -28,7 +28,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api
 
   deploy:
-    depends-on: push-to-registry
+    needs: push-to-registry
     name: Deploy to Azure VM
     runs-on: ubuntu-latest
     steps:
