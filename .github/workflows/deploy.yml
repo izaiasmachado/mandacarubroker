@@ -1,10 +1,11 @@
-name: Java Web App CI/CD
-
+name: deploy
 on:
   push:
+    branches:
+      - feature/automatic_deploy_to_azure
 
 jobs:
-  build_java_code:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,7 +37,7 @@ jobs:
 
     - name: Start Docker
         run: docker-compose up -d db
-
+  
   deploy:
     runs-on: ubuntu-latest
     needs: build
