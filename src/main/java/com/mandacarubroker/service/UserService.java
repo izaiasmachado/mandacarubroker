@@ -31,4 +31,19 @@ public class UserService {
         User newUser = new User(requestUserDTO);
         return userRepository.save(newUser);
     }
+
+    public Optional<User> updateUser(final String userId, final RequestUserDTO requestUserDTO) {
+        validateRequestDTO(requestUserDTO);
+        return userRepository.findById(userId)
+                .map(user -> {
+                    user.setEmail(requestUserDTO.email());
+                    user.setUsername(requestUserDTO.username());
+                    user.setPassword(requestUserDTO.password());
+                    user.setFirstName(requestUserDTO.firstName());
+                    user.setLastName(requestUserDTO.lastName());
+                    user.setBirthDate(requestUserDTO.birthDate());
+                    user.setBalance(requestUserDTO.balance());
+                    return userRepository.save(user);
+                });
+    }
 }

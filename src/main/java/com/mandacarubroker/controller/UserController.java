@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 
 
 import java.util.List;
@@ -45,6 +46,17 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody final RequestUserDTO requestUserDTO) {
         User createdUser = userService.createUser(requestUserDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable final String id, @RequestBody final RequestUserDTO updatedUserDTO) {
+        Optional<User> updatedUser = userService.updateUser(id, updatedUserDTO);
+
+        if (updatedUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(updatedUser.get());
     }
 }
 
