@@ -66,7 +66,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         user = service.getAllUsers().get(0);
-        userId = user.getEmail();
+        userId = user.getId();
         urlRequestUserById = "/users/" + userId;
     }
 

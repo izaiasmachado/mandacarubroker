@@ -20,7 +20,8 @@ VALUES
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
-                       email VARCHAR PRIMARY KEY,
+                       id VARCHAR PRIMARY KEY,
+                       email VARCHAR NOT NULL,
                        username VARCHAR NOT NULL,
                        password VARCHAR NOT NULL,
                        firstName VARCHAR NOT NULL,
@@ -29,10 +30,10 @@ CREATE TABLE users (
                        balance DECIMAL
 );
 
-INSERT INTO users (email, username, password, firstName, lastName, birthDate, balance)
+INSERT INTO users (id, email, username, password, firstName, lastName, birthDate, balance)
 VALUES
-    ('joaopereira@hotmail.com', 'JoaoP', 'qwerty123', 'Joao', 'Pereira', '1988-07-05', 150.25),
-    ('maria.rodrigues@yahoo.com', 'MariaRod', 'pass456', 'Maria', 'Rodrigues', '1992-12-15', 75.60),
-    ('carlos.almeida@gmail.com', 'CarlosA', 'pass789', 'Carlos', 'Almeida', '1980-05-02', 500.00),
-    ('ana.silva@gmail.com', 'AnaSilva', 'xyz789', 'Ana', 'Silva', '1995-03-21', 300.50),
-    ('patricia.santos@hotmail.com', 'PatriciaS', 'pass123', 'Patricia', 'Santos', '1998-08-30', 250.75);
+    ('b2d13c5a-3df0-4673-b3e7-49244f395ac8', 'joaopereira@hotmail.com', 'JoaoP', 'qwerty123', 'Joao', 'Pereira', '1988-07-05', 150.25),
+    ('b2d13c5a-3df0-4673-b3e6-49245f395ac0', 'maria.rodrigues@yahoo.com', 'MariaRod', 'pass456', 'Maria', 'Rodrigues', '1992-12-15', 75.60),
+    ('b2d13c5a-3df0-4673-b3e6-49244f394ac2', 'carlos.almeida@gmail.com', 'CarlosA', 'pass789', 'Carlos', 'Almeida', '1980-05-02', 500.00),
+    ('b2d13c5a-7df0-4673-b3e6-49244f395ac1', 'ana.silva@gmail.com', 'AnaSilva', 'xyz789', 'Ana', 'Silva', '1995-03-21', 300.50),
+    ('b2d13c5a-9df0-4673-b3e6-49244f395ac6', 'patricia.santos@hotmail.com', 'PatriciaS', 'pass123', 'Patricia', 'Santos', '1998-08-30', 250.75);
