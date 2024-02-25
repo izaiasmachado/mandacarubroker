@@ -5,6 +5,8 @@ import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.mandacarubroker.validation.RecordValidation.validateRequestDTO;
 
 @Service
@@ -13,6 +15,10 @@ public class UserService {
 
     public UserService(final UserRepository recievedUserRepository) {
         this.userRepository = recievedUserRepository;
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public User createUser(final RequestUserDTO requestUserDTO) {
