@@ -22,6 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,6 +40,24 @@ class UserControllerTest {
     @Autowired
     private UserService service;
 
+    private final String validEmail = "lara.souza@gmail.com";
+    private final String validUsername = "LaraS";
+    private final String validPassword = "pass555";
+    private final String validFirstName = "Lara";
+    private final String validLastName = "Souza";
+    private final LocalDate validBirthDate = LocalDate.of(1997,4,5);
+    private final double validBalance = 90.50;
+
+    private final RequestUserDTO validUserDTO = new RequestUserDTO(
+            validEmail,
+            validUsername,
+            validPassword,
+            validFirstName,
+            validLastName,
+            validBirthDate,
+            validBalance
+    );
+
     private final String urlRequestInvalidUser = "/users/dummy-user-id";
     private User user;
     private String userId;
@@ -53,6 +72,16 @@ class UserControllerTest {
 
     @AfterEach
     void tearDown() {
+    }
+
+    void assertRequestDTOEqualsUser(final RequestUserDTO userDTO, final User receivedUser) {
+        assertEquals(userDTO.email(), receivedUser.getEmail());
+        assertEquals(userDTO.username(), receivedUser.getUsername());
+        assertEquals(userDTO.password(), receivedUser.getPassword());
+        assertEquals(userDTO.firstName(), receivedUser.getFirstName());
+        assertEquals(userDTO.lastName(), receivedUser.getLastName());
+        assertEquals(userDTO.birthDate(), receivedUser.getBirthDate());
+        assertEquals(userDTO.balance(), receivedUser.getBalance());
     }
 
 
@@ -99,5 +128,31 @@ class UserControllerTest {
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
     }
 
+    @Test
+    void itShouldReturnCreatedStatusAfterSucessfulPost() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isCreated();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldReturnUserDataAfterSucessfulPost() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        String content = result.getResponse().getContentAsString();
+        User createdUser = objectMapper.readValue(content, User.class);
+
+        assertRequestDTOEqualsUser(validUserDTO, createdUser);
+    }
 
 }
