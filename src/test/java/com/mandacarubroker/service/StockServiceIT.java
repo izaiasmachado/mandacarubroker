@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class StockServiceTest {
+class StockServiceIT {
     @Autowired
     private MockMvc mockMvc;
 

@@ -5,6 +5,10 @@ staged_files=$(git diff --staged --name-only)
 
 # Run Checkstyle only on staged files
 for file in $staged_files; do
+    if [[ $file != *.java ]]; then
+        continue
+    fi
+
     echo "Running Checkstyle on $file"
 
     # Run Checkstyle on the staged file
@@ -17,3 +21,13 @@ for file in $staged_files; do
         exit 1
     fi
 done
+
+# Run unit tests
+mvn test
+
+# Check if the tests passed
+status=$?
+if [ $status -ne 0 ]; then
+    echo "Unit tests failed. Please fix them before committing."
+    exit 1
+fi

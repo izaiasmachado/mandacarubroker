@@ -6,8 +6,27 @@ on:
       - main
 
 jobs:
-  test:
-    name: Run tests
+  unit-tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build with Maven
+        run: mvn clean install -Dmaven.test.skip=true -X
+
+      - name: Run tests
+        run: mvn test -X
+
+  integration-tests:
+    name: Run integration tests
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK
@@ -32,7 +51,7 @@ jobs:
         run: docker-compose up -d db
 
       - name: Run tests
-        run: mvn test -X
+        run: mvn failsafe:integration-test
 
       - name: Stop Docker
         run: docker-compose down
