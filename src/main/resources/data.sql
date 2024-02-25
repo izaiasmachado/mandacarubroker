@@ -15,3 +15,25 @@ VALUES
     ('b2d13c5a-3df0-4673-b3e6-49244f395af9', 'AMZN4', 'Amazon.com Inc.', 400.00),
     ('b2d13c5a-3df0-4673-b3e6-49244f395a99', 'META5', 'Facebook Inc.', 500.00)
     ON CONFLICT (id) DO NOTHING;
+
+
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+                       id VARCHAR PRIMARY KEY,
+                       email VARCHAR NOT NULL,
+                       username VARCHAR NOT NULL,
+                       password VARCHAR NOT NULL,
+                       firstName VARCHAR NOT NULL,
+                       lastName VARCHAR,
+                       birthDate DATE NOT NULL,
+                       balance DECIMAL
+);
+
+INSERT INTO users (id, email, username, password, firstName, lastName, birthDate, balance)
+VALUES
+    ('b2d13c5a-3df0-4673-b3e7-49244f395ac8', 'joaopereira@hotmail.com', 'JoaoP', 'qwerty123', 'Joao', 'Pereira', '1988-07-05', 150.25),
+    ('b2d13c5a-3df0-4673-b3e6-49245f395ac0', 'maria.rodrigues@yahoo.com', 'MariaRod', 'pass456', 'Maria', 'Rodrigues', '1992-12-15', 75.60),
+    ('b2d13c5a-3df0-4673-b3e6-49244f394ac2', 'carlos.almeida@gmail.com', 'CarlosA', 'pass789', 'Carlos', 'Almeida', '1980-05-02', 500.00),
+    ('b2d13c5a-7df0-4673-b3e6-49244f395ac1', 'ana.silva@gmail.com', 'AnaSilva', 'xyz789', 'Ana', 'Silva', '1995-03-21', 300.50),
+    ('b2d13c5a-9df0-4673-b3e6-49244f395ac6', 'patricia.santos@hotmail.com', 'PatriciaS', 'pass123', 'Patricia', 'Santos', '1998-08-30', 250.75);
