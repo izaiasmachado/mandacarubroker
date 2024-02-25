@@ -21,8 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -154,5 +153,46 @@ class UserControllerTest {
 
         assertRequestDTOEqualsUser(validUserDTO, createdUser);
     }
+
+    @Test
+    void itShouldReturnUserDataAfterSucessfulPut() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        String content = result.getResponse().getContentAsString();
+        User updatedUser = objectMapper.readValue(content, User.class);
+
+        assertRequestDTOEqualsUser(validUserDTO, updatedUser);
+    }
+
+    @Test
+    void itShouldReturnOkStatusAfterSucessfulPut() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isOk();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldReturnNotFoundWhenPutUserDoesNotExists() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestInvalidUser)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isNotFound();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+
 
 }
