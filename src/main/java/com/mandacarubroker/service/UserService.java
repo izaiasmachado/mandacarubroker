@@ -6,6 +6,7 @@ import com.mandacarubroker.domain.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.mandacarubroker.validation.RecordValidation.validateRequestDTO;
 
@@ -19,6 +20,10 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Optional<User> getUserById(final String userId) {
+        return userRepository.findById(userId);
     }
 
     public User createUser(final RequestUserDTO requestUserDTO) {
