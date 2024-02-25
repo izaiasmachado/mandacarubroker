@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -193,6 +194,25 @@ class UserControllerTest {
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
     }
 
+    @Test
+    void itShouldBeAbleToDeleteUser() throws Exception {
+        RequestBuilder requestBuilder = delete(urlRequestUserById);
+        ResultMatcher matchStatus = status().isNoContent();
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        assertEquals(Optional.empty(), service.getUserById(userId));
+    }
 
+    @Test
+    void itShouldReturnNoContentStatusWhenDeleteUser() throws Exception {
+        RequestBuilder requestBuilder = delete(urlRequestUserById);
+        ResultMatcher matchStatus = status().isNoContent();
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
 
+    @Test
+    void itShouldReturnNoContentStatusWhenDeleteUserDoesNotExists() throws Exception {
+        RequestBuilder requestBuilder = delete(urlRequestInvalidUser);
+        ResultMatcher matchStatus = status().isNoContent();
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
 }
