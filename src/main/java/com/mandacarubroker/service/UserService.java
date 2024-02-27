@@ -13,6 +13,7 @@ import static com.mandacarubroker.validation.RecordValidation.validateRequestDTO
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordHashingService passwordHashingService = new PasswordHashingService();
 
     public UserService(final UserRepository recievedUserRepository) {
         this.userRepository = recievedUserRepository;
@@ -26,14 +27,26 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
+    private User hashPassword(final User user) {
+        final String rawPassword = user.getPassword();
+        final String hashedPassword = passwordHashingService.hashPassword(rawPassword);
+        user.setPassword(hashedPassword);
+        return user;
+    }
+
     public User createUser(final RequestUserDTO requestUserDTO) {
         validateRequestDTO(requestUserDTO);
         User newUser = new User(requestUserDTO);
-        return userRepository.save(newUser);
+        User hashedPasswordUser = hashPassword(newUser);
+        return userRepository.save(hashedPasswordUser);
     }
 
     public Optional<User> updateUser(final String userId, final RequestUserDTO requestUserDTO) {
         validateRequestDTO(requestUserDTO);
+
+        final String rawPassword = requestUserDTO.password();
+        final String hashedPassword = passwordHashingService.hashPassword(rawPassword);
+
         return userRepository.findById(userId)
                 .map(user -> {
                     user.setEmail(requestUserDTO.email());
@@ -43,6 +56,7 @@ public class UserService {
                     user.setLastName(requestUserDTO.lastName());
                     user.setBirthDate(requestUserDTO.birthDate());
                     user.setBalance(requestUserDTO.balance());
+                    user.setPassword(hashedPassword);
                     return userRepository.save(user);
                 });
     }
