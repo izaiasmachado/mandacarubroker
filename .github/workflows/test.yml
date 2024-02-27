@@ -49,11 +49,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Build with Maven
-        run: mvn clean install -Dmaven.test.skip=true -X
-
       - name: Start Docker
         run: docker-compose up -d db-test
+
+      - name: Build
+        run: mvn clean install -X
 
       - name: Run tests
         run: mvn failsafe:integration-test
