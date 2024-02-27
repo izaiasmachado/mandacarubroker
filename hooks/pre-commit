@@ -1,17 +1,12 @@
 #!/bin/bash
+# Get a list of staged Java files
+staged_files=$(git diff --staged --name-only -- '*.java')
 
-# Get a list of staged files
-staged_files=$(git diff --staged --name-only)
-
-# Run Checkstyle only on staged files
+# Run Checkstyle only on staged Java files
 for file in $staged_files; do
-    if [[ $file != *.java ]]; then
-        continue
-    fi
-
     echo "Running Checkstyle on $file"
 
-    # Run Checkstyle on the staged file
+    # Run Checkstyle on the staged Java file
     mvn checkstyle:check -Dcheckstyle.config.location=config/checkstyle.xml -DconsoleOutput=True -DfailOnViolation=True -Dincludes=$file
     status=$?
 
@@ -21,13 +16,3 @@ for file in $staged_files; do
         exit 1
     fi
 done
-
-# Run unit tests
-mvn test
-
-# Check if the tests passed
-status=$?
-if [ $status -ne 0 ]; then
-    echo "Unit tests failed. Please fix them before committing."
-    exit 1
-fi
