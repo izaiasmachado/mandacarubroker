@@ -41,4 +41,4 @@ jobs:
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 400 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key william@172.176.145.143 'sudo docker stop mandacarubroker-api || true && docker rm mandacarubroker-api || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name mandacarubroker-api --env-file=/home/william/mandacaru-broker-jandaia/.env -p 8080:8080 -d izaiasmachado/mandacarubroker-api'
+          ssh -o StrictHostKeyChecking=no -i private_key william@172.176.145.143 'sudo docker pull && sudo docker stop mandacarubroker-api || true && docker rm mandacarubroker-api || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name mandacarubroker-api --env-file=/home/william/mandacaru-broker-jandaia/.env -p 8080:8080 -d izaiasmachado/mandacarubroker-api'
