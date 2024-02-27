@@ -30,6 +30,10 @@ jobs:
     name: Run integration tests
     runs-on: ubuntu-latest
     env:
+      MANDACARU_POSTGRES_DB: "mandacaru_broker"
+      MANDACARU_POSTGRES_USER: "time_dez"
+      MANDACARU_POSTGRES_PASSWORD: "mandacaru"
+      MANDACARU_POSTGRES_PORT: 5433
       MANDACARU_TEST_POSTGRES_PORT: 5432
       MANDACARU_TEST_POSTGRES_DB: "mandacaru_broker_test"
       MANDACARU_TEST_POSTGRES_USER: "time_dez_test"
