@@ -61,7 +61,7 @@ class StockControllerIT {
     void tearDown() {
     }
 
-    void assertRequestDTOEqualsStock(final RequestStockDTO stockDTO, final Stock receivedStock) {
+    void assertRequestDTOEqualsStock(RequestStockDTO stockDTO, final Stock receivedStock) {
         assertEquals(stockDTO.symbol(), receivedStock.getSymbol());
         assertEquals(stockDTO.companyName(), receivedStock.getCompanyName());
         assertEquals(stockDTO.price(), receivedStock.getPrice());
