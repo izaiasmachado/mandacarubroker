@@ -12,6 +12,16 @@ jobs:
   sonarcloud:
     name: SonarCloud Quality Gate
     runs-on: ubuntu-latest
+    env:
+      MANDACARU_POSTGRES_DB: "mandacaru_broker"
+      MANDACARU_POSTGRES_USER: "time_dez"
+      MANDACARU_POSTGRES_PASSWORD: "mandacaru"
+      MANDACARU_POSTGRES_PORT: 5432
+      MANDACARU_TEST_POSTGRES_DB: "mandacaru_broker_test"
+      MANDACARU_TEST_POSTGRES_USER: "time_dez_test"
+      MANDACARU_TEST_POSTGRES_PASSWORD: "mandacaru"
+      MANDACARU_TEST_POSTGRES_PORT: 5433
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -22,9 +32,6 @@ jobs:
         with:
           java-version: 17
           distribution: "zulu"
-
-      - name: Copy .env file
-        run: cp .env.test .env
 
       - name: Export environment variables
         run: export $(grep -v '^#' .env | xargs)
@@ -44,7 +51,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Start Docker
-        run: docker-compose up -d db
+        run: docker-compose up -d db-test
 
       - name: SonarCloud Scan
         env:

@@ -28,6 +28,17 @@ jobs:
   integration-tests:
     name: Run integration tests
     runs-on: ubuntu-latest
+    needs: unit-tests
+    env:
+      MANDACARU_POSTGRES_DB: "mandacaru_broker"
+      MANDACARU_POSTGRES_USER: "time_dez"
+      MANDACARU_POSTGRES_PASSWORD: "mandacaru"
+      MANDACARU_POSTGRES_PORT: 5432
+      MANDACARU_TEST_POSTGRES_DB: "mandacaru_broker_test"
+      MANDACARU_TEST_POSTGRES_USER: "time_dez_test"
+      MANDACARU_TEST_POSTGRES_PASSWORD: "mandacaru"
+      MANDACARU_TEST_POSTGRES_PORT: 5433
+
     steps:
       - name: Set up JDK
         uses: actions/setup-java@v2
@@ -38,17 +49,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Copy .env file
-        run: cp .env.test .env
-
-      - name: Export environment variables
-        run: export $(grep -v '^#' .env | xargs)
-
-      - name: Build with Maven
-        run: mvn clean install -Dmaven.test.skip=true -X
-
       - name: Start Docker
-        run: docker-compose up -d db
+        run: docker-compose up -d db-test
+
+      - name: Build
+        run: mvn clean install -X
 
       - name: Run tests
         run: mvn failsafe:integration-test
