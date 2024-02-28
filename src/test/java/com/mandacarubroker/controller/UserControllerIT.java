@@ -77,7 +77,6 @@ class UserControllerIT {
     void assertRequestDTOEqualsUser(final RequestUserDTO userDTO, final User receivedUser) {
         assertEquals(userDTO.email(), receivedUser.getEmail());
         assertEquals(userDTO.username(), receivedUser.getUsername());
-        assertEquals(userDTO.password(), receivedUser.getPassword());
         assertEquals(userDTO.firstName(), receivedUser.getFirstName());
         assertEquals(userDTO.lastName(), receivedUser.getLastName());
         assertEquals(userDTO.birthDate(), receivedUser.getBirthDate());
