@@ -4,6 +4,7 @@ package com.mandacarubroker.controller;
 import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,13 +45,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody final RequestUserDTO requestUserDTO) {
+    public ResponseEntity<User> createUser(@RequestBody @Valid final RequestUserDTO requestUserDTO) {
         User createdUser = userService.createUser(requestUserDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable final String id, @RequestBody final RequestUserDTO updatedUserDTO) {
+    public ResponseEntity<User> updateUser(@PathVariable @Valid final String id, @RequestBody final RequestUserDTO updatedUserDTO) {
         Optional<User> updatedUser = userService.updateUser(id, updatedUserDTO);
 
         if (updatedUser.isEmpty()) {
