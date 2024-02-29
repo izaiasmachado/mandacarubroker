@@ -1,10 +1,9 @@
 package com.mandacarubroker.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-
 import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.User;
+import com.mandacarubroker.domain.user.UserRepository;
 import com.mandacarubroker.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +31,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerIT {
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -41,11 +43,11 @@ class UserControllerIT {
     private UserService service;
 
     private final String validEmail = "lara.souza@gmail.com";
-    private final String validUsername = "LaraS";
-    private final String validPassword = "pass555";
+    private final String validUsername = "LaraSoU";
+    private final String validPassword = "#pass555";
     private final String validFirstName = "Lara";
     private final String validLastName = "Souza";
-    private final LocalDate validBirthDate = LocalDate.of(1997,4,5);
+    private final LocalDate validBirthDate = LocalDate.of(2006,2,28);
     private final double validBalance = 90.50;
 
     private final RequestUserDTO validUserDTO = new RequestUserDTO(
@@ -72,6 +74,10 @@ class UserControllerIT {
 
     @AfterEach
     void tearDown() {
+        User alreadyExistentUser = userRepository.findByUsername(validUsername);
+        if(alreadyExistentUser != null){
+            service.deleteUser(alreadyExistentUser.getId());
+        }
     }
 
     void assertRequestDTOEqualsUser(final RequestUserDTO userDTO, final User receivedUser) {
