@@ -26,6 +26,6 @@ public record RequestUserDTO(
         double balance
 ) {
     private static final int MINIMUMPASSWORDLENGTH = 8;
-    private static final int MINIMUMAGE = 21;
+    private static final int MINIMUMAGE = 18;
 }
 
