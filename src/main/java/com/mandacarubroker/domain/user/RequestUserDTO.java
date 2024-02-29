@@ -19,11 +19,13 @@ public record RequestUserDTO(
         String firstName,
         @NotBlank(message = "Last name cannot be blank")
         String lastName,
+        @MinimumAge(value = MINIMUMAGE)
         LocalDate birthDate,
         @NotNull(message = "Balance cannot be null")
         @PositiveOrZero(message = "Balance cannot be negative")
         double balance
 ) {
     private static final int MINIMUMPASSWORDLENGTH = 8;
+    private static final int MINIMUMAGE = 21;
 }
 
