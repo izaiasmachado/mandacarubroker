@@ -42,11 +42,11 @@ public class User {
     }
 
     public void deposit(final double amount) {
-        if (amount > 0) {
-            this.balance += amount;
-        } else {
+        if (amount <= 0) {
             throw new IllegalArgumentException("O valor do depósito deve ser maior que zero.");
         }
+        this.balance += amount;
     }
+
 
 }

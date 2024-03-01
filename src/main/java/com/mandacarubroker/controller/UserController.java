@@ -63,11 +63,13 @@ public class UserController {
     @PutMapping("/{id}/deposit")
     public ResponseEntity<User> deposit(@PathVariable final String id, @RequestBody final double amount) {
         Optional<User> updatedUser = userService.deposit(id, amount);
-        if (updatedUser.isPresent()) {
-            return ResponseEntity.ok(updatedUser.get());
-        } else {
-            return ResponseEntity.notFound().build(); // Usuário não encontrado
+
+        if (!updatedUser.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok(updatedUser.get());
+
     }
 
     @DeleteMapping("/{id}")
