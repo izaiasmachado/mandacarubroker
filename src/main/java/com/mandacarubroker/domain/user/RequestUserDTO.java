@@ -13,19 +13,19 @@ public record RequestUserDTO(
         String email,
         @NotBlank(message = "Username cannot be blank")
         String username,
-        @Size(min = MINIMUMPASSWORDLENGTH, message = "Password must be at least 8 characters long")
+        @Size(min = MINIMUM_PASSWORD_LENGTH, message = "Password must be at least 8 characters long")
         String password,
         @NotBlank(message = "First name cannot be blank")
         String firstName,
         @NotBlank(message = "Last name cannot be blank")
         String lastName,
-        @MinimumAge(value = MINIMUMAGE)
+        @MinimumAge(value = MINIMUM_AGE)
         LocalDate birthDate,
         @NotNull(message = "Balance cannot be null")
         @PositiveOrZero(message = "Balance cannot be negative")
         double balance
 ) {
-    private static final int MINIMUMPASSWORDLENGTH = 8;
-    private static final int MINIMUMAGE = 18;
+    private static final int MINIMUM_PASSWORD_LENGTH = 8;
+    private static final int MINIMUM_AGE = 18;
 }
 
