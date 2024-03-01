@@ -1,9 +1,11 @@
 package com.mandacarubroker.service;
 
 import com.mandacarubroker.domain.auth.RequestAuthUserDTO;
+import com.mandacarubroker.domain.auth.ResponseAuthUserDTO;
 import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
+import com.mandacarubroker.security.SecuritySecretsMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,13 +20,15 @@ class AuthServiceTest {
     @MockBean
     private UserRepository userRepository;
     private AuthService authService;
-    private final PasswordHashingService passwordHashingService = new PasswordHashingService();
+    private PasswordHashingService passwordHashingService;
+    private TokenService tokenService;
 
     private final String validEmail = "lara.souza@gmail.com";
     private final String validUsername = "username";
     private final String invalidUsername = "invalidUsername";
     private final String validPassword = "password";
-    private final String validHashedPassword = passwordHashingService.hashPassword(validPassword);
+    private final String invalidPassword = "invalidPassword";
+    private final String validHashedPassword = "hashedPassword";
     private final String validFirstName = "Lara";
     private final String validLastName = "Souza";
     private final LocalDate validBirthDate = LocalDate.of(1997,4,5);
@@ -40,15 +44,35 @@ class AuthServiceTest {
             validBalance
     );
 
+    private final RequestAuthUserDTO validRequestAuthUserDTO = new RequestAuthUserDTO(
+            validUsername,
+            validPassword
+    );
+
+    private final String validToken = "Bearer token";
+    private final int expiresIn = 86400;
+    private final String tokenType = "Bearer";
+
+
     private User validUser;
 
     @BeforeEach
     void setUp() {
+        SecuritySecretsMock.mockStatic();
+
         userRepository = Mockito.mock(UserRepository.class);
         validUser = new User(validRequestUserDTO);
         Mockito.when(userRepository.findByUsername(validUsername)).thenReturn(validUser);
         Mockito.when(userRepository.findByUsername(invalidUsername)).thenReturn(null);
-        authService = new AuthService(userRepository);
+
+        passwordHashingService = Mockito.mock(PasswordHashingService.class);
+        Mockito.when(passwordHashingService.matches(validPassword, validHashedPassword)).thenReturn(true);
+        Mockito.when(passwordHashingService.matches(invalidPassword, validHashedPassword)).thenReturn(false);
+
+        tokenService = Mockito.mock(TokenService.class);
+        Mockito.when(tokenService.encodeToken(validUser.getId())).thenReturn(new ResponseAuthUserDTO(validToken, expiresIn, tokenType));
+
+        authService = new AuthService(userRepository, passwordHashingService, tokenService);
     }
 
     private void assertUsersAreEqual(final User expected, final User actual) {
@@ -62,34 +86,58 @@ class AuthServiceTest {
     }
 
     @Test
-    void itShouldBeAbleToLoginWithValidUser() {
-        RequestAuthUserDTO validRequestAuthUserDTO = new RequestAuthUserDTO(
-                validUsername,
-                validPassword
-        );
-
-        Optional<User> user = authService.login(validRequestAuthUserDTO);
+    void itShouldBeAbleGetUserGivenValidCredentials() {
+        Optional<User> user = authService.getUserGivenCredentials(validRequestAuthUserDTO);
         assertEquals(true, user.isPresent());
         assertUsersAreEqual(validUser, user.get());
     }
 
     @Test
-    void itShouldNotBeAbleToLoginWithInvalidPassword() {
+    void itShouldNotBeAbleToGetUserGivenInvalidPassword() {
         RequestAuthUserDTO invalidRequestAuthUserDTO = new RequestAuthUserDTO(
                 validUsername,
-                "invalidPassword"
+                invalidPassword
         );
-        Optional<User> user = authService.login(invalidRequestAuthUserDTO);
+        Optional<User> user = authService.getUserGivenCredentials(invalidRequestAuthUserDTO);
         assertEquals(false, user.isPresent());
     }
 
     @Test
-    void itShouldNotBeAbleToLoginWithInvalidUsername() {
+    void itShouldNotBeAbleToGetUserGivenInvalidUsername() {
         RequestAuthUserDTO invalidRequestAuthUserDTO = new RequestAuthUserDTO(
                 invalidUsername,
                 validPassword
         );
-        Optional<User> user = authService.login(invalidRequestAuthUserDTO);
+        Optional<User> user = authService.getUserGivenCredentials(invalidRequestAuthUserDTO);
         assertEquals(false, user.isPresent());
+    }
+
+    @Test
+    void itShouldBeAbleToGetJwtTokenGivenValidUser() {
+        Optional<ResponseAuthUserDTO> responseAuthUserDTO = authService.login(validRequestAuthUserDTO);
+        assertEquals(true, responseAuthUserDTO.isPresent());
+        assertEquals(validToken, responseAuthUserDTO.get().token());
+        assertEquals(expiresIn, responseAuthUserDTO.get().expiresIn());
+        assertEquals(tokenType, responseAuthUserDTO.get().tokenType());
+    }
+
+    @Test
+    void itShouldNotBeAbleToGetJwtTokenGivenInvalidUsername() {
+        RequestAuthUserDTO invalidRequestAuthUserDTO = new RequestAuthUserDTO(
+                invalidUsername,
+                validPassword
+        );
+        Optional<ResponseAuthUserDTO> responseAuthUserDTO = authService.login(invalidRequestAuthUserDTO);
+        assertEquals(false, responseAuthUserDTO.isPresent());
+    }
+
+    @Test
+    void itShouldNotBeAbleToGetJwtTokenGivenInvalidPassword() {
+        RequestAuthUserDTO invalidRequestAuthUserDTO = new RequestAuthUserDTO(
+                validUsername,
+                invalidPassword
+        );
+        Optional<ResponseAuthUserDTO> responseAuthUserDTO = authService.login(invalidRequestAuthUserDTO);
+        assertEquals(false, responseAuthUserDTO.isPresent());
     }
 }

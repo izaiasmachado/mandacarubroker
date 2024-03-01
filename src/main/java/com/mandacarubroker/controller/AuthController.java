@@ -1,7 +1,7 @@
 package com.mandacarubroker.controller;
 
 import com.mandacarubroker.domain.auth.RequestAuthUserDTO;
-import com.mandacarubroker.domain.user.User;
+import com.mandacarubroker.domain.auth.ResponseAuthUserDTO;
 import com.mandacarubroker.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,13 +23,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody final RequestAuthUserDTO requestAuthUserDTO) {
-        Optional<User> user = authService.login(requestAuthUserDTO);
+    public ResponseEntity<ResponseAuthUserDTO> login(@Valid @RequestBody final RequestAuthUserDTO requestAuthUserDTO) {
+        Optional<ResponseAuthUserDTO> responseAuthUserDTO = authService.login(requestAuthUserDTO);
 
-        if (user.isEmpty()) {
+        if (responseAuthUserDTO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.ok("User logged in successfully");
+        return ResponseEntity.ok(responseAuthUserDTO.orElseThrow());
     }
 }

@@ -17,6 +17,7 @@ jobs:
       MANDACARU_POSTGRES_USER: "time_dez"
       MANDACARU_POSTGRES_PASSWORD: "mandacaru"
       MANDACARU_POSTGRES_PORT: 5432
+      MANDACARU_JWT_SECRET: mandacaru-jwt-secret
       MANDACARU_TEST_POSTGRES_DB: "mandacaru_broker_test"
       MANDACARU_TEST_POSTGRES_USER: "time_dez_test"
       MANDACARU_TEST_POSTGRES_PASSWORD: "mandacaru"

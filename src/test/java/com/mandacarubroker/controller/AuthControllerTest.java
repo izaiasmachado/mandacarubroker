@@ -1,8 +1,9 @@
 package com.mandacarubroker.controller;
 
 import com.mandacarubroker.domain.auth.RequestAuthUserDTO;
+import com.mandacarubroker.domain.auth.ResponseAuthUserDTO;
 import com.mandacarubroker.domain.user.RequestUserDTO;
-import com.mandacarubroker.domain.user.User;
+import com.mandacarubroker.security.SecuritySecretsMock;
 import com.mandacarubroker.service.AuthService;
 import com.mandacarubroker.service.PasswordHashingService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,8 @@ class AuthControllerTest {
     @MockBean
     private AuthService authService;
     private AuthController authController;
+
+    private static final String TOKEN_TYPE = "Bearer";
 
     private final PasswordHashingService passwordHashingService = new PasswordHashingService();
 
@@ -50,12 +53,18 @@ class AuthControllerTest {
             validPassword
     );
 
+    private final ResponseAuthUserDTO validResponseAuthUserDTO = new ResponseAuthUserDTO(
+            "Bearer token",
+            86400,
+            "Bearer"
+    );
+
     @BeforeEach
     void setUp() {
+        SecuritySecretsMock.mockStatic();
+
         authService = Mockito.mock(AuthService.class);
-        User validUser = new User(validRequestUserDTO);
-        Optional<User> optionalValidUser = Optional.of(validUser);
-        Mockito.when(authService.login(validRequestAuthUserDTO)).thenReturn(optionalValidUser);
+        Mockito.when(authService.login(validRequestAuthUserDTO)).thenReturn(Optional.of(validResponseAuthUserDTO));
         Mockito.when(authService.login(new RequestAuthUserDTO(invalidUsername, validPassword))).thenReturn(Optional.empty());
         Mockito.when(authService.login(new RequestAuthUserDTO(validUsername, invalidPassword))).thenReturn(Optional.empty());
         authController = new AuthController(authService);
@@ -63,8 +72,12 @@ class AuthControllerTest {
 
     @Test
     void itShouldBeAbleToLoginWithValidUser() {
-        ResponseEntity<String> response = authController.login(validRequestAuthUserDTO);
-        assertEquals(ResponseEntity.ok("User logged in successfully"), response);
+        ResponseEntity<ResponseAuthUserDTO> response = authController.login(validRequestAuthUserDTO);
+        ResponseAuthUserDTO responseAuthUserDTO = response.getBody();
+
+        assertEquals(ResponseEntity.ok().build().getStatusCode(), response.getStatusCode());
+        assertEquals(ResponseAuthUserDTO.class, responseAuthUserDTO.getClass());
+        assertEquals(TOKEN_TYPE, responseAuthUserDTO.tokenType());
     }
 
     @Test
@@ -74,7 +87,7 @@ class AuthControllerTest {
                 validPassword
         );
 
-        ResponseEntity<String> response = authController.login(invalidRequestAuthUserDTO);
+        ResponseEntity<ResponseAuthUserDTO> response = authController.login(invalidRequestAuthUserDTO);
         assertEquals(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(), response);
     }
 
@@ -85,7 +98,7 @@ class AuthControllerTest {
                 invalidPassword
         );
 
-        ResponseEntity<String> response = authController.login(invalidRequestAuthUserDTO);
+        ResponseEntity<ResponseAuthUserDTO> response = authController.login(invalidRequestAuthUserDTO);
         assertEquals(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(), response);
     }
 }

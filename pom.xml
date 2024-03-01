@@ -17,6 +17,7 @@
 		<java.version>17</java.version>
 		<sonar.organization>mandacaru-broker</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<powermock.version>2.0.2</powermock.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -71,6 +72,11 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>4.4.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 			<version>5.0.7.RELEASE</version>
@@ -88,7 +94,6 @@
 			<artifactId>junit-jupiter-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>com.puppycrawl.tools</groupId>
 			<artifactId>checkstyle</artifactId>
