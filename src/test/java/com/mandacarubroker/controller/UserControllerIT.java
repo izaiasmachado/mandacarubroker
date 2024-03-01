@@ -51,6 +51,16 @@ class UserControllerIT {
     private final LocalDate validBirthDate = LocalDate.of(2006,2,28);
     private final double validBalance = 90.50;
 
+    private final RequestUserDTO invalidEmailUserDTO = new RequestUserDTO(
+            "marcosloiola@.yahoo.com",
+            "Marcos22",
+            "passmarco123",
+            "Marcos",
+            "Loiola",
+            LocalDate.of(2002, 2, 26),
+            0.25
+    );
+
     private final RequestUserDTO validUserDTO = new RequestUserDTO(
             validEmail,
             validUsername,
@@ -225,4 +235,18 @@ class UserControllerIT {
         ResultMatcher matchStatus = status().isNoContent();
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
     }
+
+    @Test
+    void itShouldHandlePostInvalidUserEmail() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidEmailUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+
 }
