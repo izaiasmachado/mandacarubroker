@@ -61,6 +61,16 @@ class UserControllerIT {
             0.25
     );
 
+    private final RequestUserDTO invalidPasswordUserDTO = new RequestUserDTO(
+            "marcosloiola@yahoo.com",
+            "Marcos23",
+            "pass123",
+            "Marcos",
+            "Loiola",
+            LocalDate.of(2002, 2, 26),
+            0.25
+    );
+
     private final RequestUserDTO validUserDTO = new RequestUserDTO(
             validEmail,
             validUsername,
@@ -261,5 +271,17 @@ class UserControllerIT {
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
     }
 
+    @Test
+    void itShouldHandlePostInvalidUserPassword() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidPasswordUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+
+    }
 
 }
