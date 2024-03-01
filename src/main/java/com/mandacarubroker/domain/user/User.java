@@ -48,5 +48,14 @@ public class User {
         this.balance += amount;
     }
 
+    public void withdraw(final double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("O valor do saque deve ser maior que zero.");
+        }
+        if (amount > balance) {
+            throw new IllegalArgumentException("Saldo insuficiente para o saque.");
+        }
+        balance -= amount;
+    }
 
 }

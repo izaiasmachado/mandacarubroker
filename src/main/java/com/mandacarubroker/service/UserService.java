@@ -57,6 +57,22 @@ public class UserService {
         return Optional.of(userRepository.save(user));
     }
 
+    public Optional<User> withdraw(final String userId, final double amount) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        User user = userOptional.get();
+        if (amount <= 0) {
+            throw new IllegalArgumentException("O valor do saque deve ser maior que zero.");
+        }
+        if (amount > user.getBalance()) {
+            throw new IllegalArgumentException("Saldo insuficiente para o saque.");
+        }
+        user.setBalance(user.getBalance() - amount);
+        return Optional.of(userRepository.save(user));
+    }
+
     public void deleteUser(final String id) {
         userRepository.deleteById(id);
     }

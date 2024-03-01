@@ -72,6 +72,18 @@ public class UserController {
 
     }
 
+    @PutMapping("/{id}/withdraw")
+    public ResponseEntity<Object> withdraw(@PathVariable final String id, @RequestBody final double amount) {
+        Optional<User> updatedUser = userService.withdraw(id, amount);
+
+        if (updatedUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(updatedUser.get());
+
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable final String id) {
         userService.deleteUser(id);
