@@ -51,7 +51,7 @@ public class SecurityConfiguration {
                     req.requestMatchers(POST, "/stocks").hasAuthority(STOCKS_CREATE.getPermission());
                     req.requestMatchers(PUT, "/stocks/**").hasAuthority(STOCKS_UPDATE.getPermission());
                     req.requestMatchers(PUT, "/stocks/**").hasAuthority(STOCKS_DELETE.getPermission());
-                    req.requestMatchers(POST, "/users").hasAuthority(USER_CREATE.getPermission());
+                    req.requestMatchers(POST, "/users").permitAll();
                     req.requestMatchers(GET, "/users").hasAuthority(USER_READ.getPermission());
                     req.requestMatchers(GET, "/users/**").hasAuthority(USER_READ.getPermission());
                     req.requestMatchers(PUT, "/users/**").hasAuthority(USER_UPDATE.getPermission());
