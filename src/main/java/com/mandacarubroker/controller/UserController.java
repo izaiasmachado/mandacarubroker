@@ -46,6 +46,9 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<ResponseUserDTO> createUser(@RequestBody @Valid final RequestUserDTO requestUserDTO) {
+        if (userService.verifyDuplicateUsername(requestUserDTO.username())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         ResponseUserDTO createdUser = userService.createUser(requestUserDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }

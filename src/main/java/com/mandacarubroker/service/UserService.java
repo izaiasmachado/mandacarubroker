@@ -85,4 +85,8 @@ public class UserService {
     public void deleteUser(final String id) {
         userRepository.deleteById(id);
     }
+    public boolean verifyDuplicateUsername(final String userName) {
+        User alreadyExistingUser = userRepository.findByUsername(userName);
+        return alreadyExistingUser != null;
+    }
 }
