@@ -248,5 +248,18 @@ class UserControllerIT {
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
     }
 
+    @Test
+    void itShouldReturnConflictStatusWhenPostDuplicatedUsername() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+
+        ResultMatcher matchStatus = status().isConflict();
+        mockMvc.perform(requestBuilder);
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
 
 }
