@@ -15,7 +15,6 @@ import static com.mandacarubroker.domain.user.Permission.STOCKS_CREATE;
 import static com.mandacarubroker.domain.user.Permission.STOCKS_DELETE;
 import static com.mandacarubroker.domain.user.Permission.STOCKS_READ;
 import static com.mandacarubroker.domain.user.Permission.STOCKS_UPDATE;
-import static com.mandacarubroker.domain.user.Permission.USER_CREATE;
 import static com.mandacarubroker.domain.user.Permission.USER_DELETE;
 import static com.mandacarubroker.domain.user.Permission.USER_READ;
 import static com.mandacarubroker.domain.user.Permission.USER_UPDATE;
