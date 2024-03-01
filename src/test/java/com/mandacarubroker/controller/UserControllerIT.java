@@ -276,6 +276,18 @@ class UserControllerIT {
     }
 
     @Test
+    void itShouldHandlePutInvalidUserEmail() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidEmailUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
     void itShouldReturnConflictStatusWhenPostDuplicatedUsername() throws Exception {
         String userJsonString = objectMapper.writeValueAsString(validUserDTO);
 
