@@ -119,10 +119,14 @@ class UserControllerIT {
                 userId = user.getId();
                 urlRequestUserById = "/users/" + userId;
                 responseUserDTO = new ResponseUserDTO(
+                                user.getId(),
+                                user.getEmail(),
+                                user.getUsername(),
                                 user.getFirstName(),
                                 user.getLastName(),
                                 user.getBirthDate(),
-                                user.getBalance());
+                                user.getBalance()
+                );
         }
 
         @AfterEach
@@ -134,6 +138,8 @@ class UserControllerIT {
         }
 
         void assertResponseUserDTO(final RequestUserDTO userRequestDTO, final ResponseUserDTO receivedUser) {
+                assertEquals(userRequestDTO.email(), receivedUser.email());
+                assertEquals(userRequestDTO.username(), receivedUser.username());
                 assertEquals(userRequestDTO.firstName(), receivedUser.firstName());
                 assertEquals(userRequestDTO.lastName(), receivedUser.lastName());
                 assertEquals(userRequestDTO.birthDate(), receivedUser.birthDate());
