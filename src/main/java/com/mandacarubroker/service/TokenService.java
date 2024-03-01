@@ -46,6 +46,11 @@ public class TokenService {
 
     public String getTokenSubject(final String token) {
         DecodedJWT decodedToken = decodeUserToken(token);
+
+        if (decodedToken == null) {
+            return null;
+        }
+
         return decodedToken.getSubject();
     }
 
