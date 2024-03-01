@@ -360,4 +360,15 @@ class UserControllerIT {
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
     }
 
+    @Test
+    void itShouldHandlePutInvalidUserBalance() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidBalanceUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
 }
