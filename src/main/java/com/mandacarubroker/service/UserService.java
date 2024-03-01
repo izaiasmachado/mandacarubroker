@@ -64,10 +64,10 @@ public class UserService {
         }
         User user = userOptional.get();
         if (amount <= 0) {
-            throw new IllegalArgumentException("O valor do saque deve ser maior que zero.");
+            throw new IllegalArgumentException("The withdrawal amount must be greater than zero.");
         }
         if (amount > user.getBalance()) {
-            throw new IllegalArgumentException("Saldo insuficiente para o saque.");
+            throw new IllegalArgumentException("Insufficient balance for withdrawal.");
         }
         user.setBalance(user.getBalance() - amount);
         return Optional.of(userRepository.save(user));
