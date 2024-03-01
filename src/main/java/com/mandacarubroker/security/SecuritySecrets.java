@@ -13,14 +13,4 @@ public final class SecuritySecrets {
 
         return secret;
     }
-
-    public static String getEnvironment() {
-        final String environment = System.getenv("MANDACARU_ENVIRONMENT");
-
-        if (environment == null) {
-            throw new MissingSecuritySecretException("Environment not found");
-        }
-
-        return environment;
-    }
 }
