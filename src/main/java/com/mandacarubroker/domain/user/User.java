@@ -55,7 +55,7 @@ public class User {
         if (amount > balance) {
             throw new IllegalArgumentException("Insufficient balance for withdrawal.");
         }
-        balance -= amount;
+        this.balance -= amount;
     }
 
 }
