@@ -3,7 +3,9 @@ package com.mandacarubroker.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.mandacarubroker.domain.user.RequestUserDTO;
+import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
+import com.mandacarubroker.domain.user.UserRepository;
 import com.mandacarubroker.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 class UserControllerIT {
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -38,12 +43,45 @@ class UserControllerIT {
     private UserService service;
 
     private final String validEmail = "lara.souza@gmail.com";
-    private final String validUsername = "LaraS";
-    private final String validPassword = "pass555";
+    private final String validUsername = "LaraSoU";
+    private final String validPassword = "#pass555";
     private final String validFirstName = "Lara";
     private final String validLastName = "Souza";
-    private final LocalDate validBirthDate = LocalDate.of(1997,4,5);
+    private final LocalDate validBirthDate = LocalDate.of(2006, 2, 28);
     private final double validBalance = 90.50;
+    private final RequestUserDTO invalidEmailUserDTO = new RequestUserDTO(
+            "marcosloiola@.yahoo.com",
+            "Marcos22",
+            "passmarco123",
+            "Marcos",
+            "Loiola",
+            LocalDate.of(2002, 2, 26),
+            0.25);
+    private final RequestUserDTO invalidPasswordUserDTO = new RequestUserDTO(
+            "marcosloiola@yahoo.com",
+            "Marcos23",
+            "pass123",
+            "Marcos",
+            "Loiola",
+            LocalDate.of(2002, 2, 26),
+            0.25);
+    private final RequestUserDTO invalidAgeUserDTO = new RequestUserDTO(
+            "marcosloiola@yahoo.com",
+            "Marcos23",
+            "passmarco123",
+            "Marcos",
+            "Loiola",
+            LocalDate.of(2006, 3, 2),
+            0.25);
+
+    private final RequestUserDTO invalidBalanceUserDTO = new RequestUserDTO(
+            "marcosloiola@yahoo.com",
+            "Marcos24",
+            "passmarco123",
+            "Marcos",
+            "Loiola",
+            LocalDate.of(2001, 3, 2),
+            -0.001);
 
     private final RequestUserDTO validUserDTO = new RequestUserDTO(
             validEmail,
@@ -52,34 +90,40 @@ class UserControllerIT {
             validFirstName,
             validLastName,
             validBirthDate,
-            validBalance
-    );
+            validBalance);
 
     private final String urlRequestInvalidUser = "/users/dummy-user-id";
     private User user;
     private String userId;
     private String urlRequestUserById;
+    private ResponseUserDTO responseUserDTO;
 
     @BeforeEach
     void setUp() {
-        user = service.getAllUsers().get(0);
+        user = userRepository.findAll().get(0);
         userId = user.getId();
         urlRequestUserById = "/users/" + userId;
+        responseUserDTO = new ResponseUserDTO(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBirthDate(),
+                user.getBalance());
     }
 
     @AfterEach
     void tearDown() {
+        User alreadyExistentUser = userRepository.findByUsername(validUsername);
+        if (alreadyExistentUser != null) {
+            service.deleteUser(alreadyExistentUser.getId());
+        }
     }
 
-    void assertRequestDTOEqualsUser(final RequestUserDTO userDTO, final User receivedUser) {
-        assertEquals(userDTO.email(), receivedUser.getEmail());
-        assertEquals(userDTO.username(), receivedUser.getUsername());
-        assertEquals(userDTO.firstName(), receivedUser.getFirstName());
-        assertEquals(userDTO.lastName(), receivedUser.getLastName());
-        assertEquals(userDTO.birthDate(), receivedUser.getBirthDate());
-        assertEquals(userDTO.balance(), receivedUser.getBalance());
+    void assertResponseUserDTO(final RequestUserDTO userRequestDTO, final ResponseUserDTO receivedUser) {
+        assertEquals(userRequestDTO.firstName(), receivedUser.firstName());
+        assertEquals(userRequestDTO.lastName(), receivedUser.lastName());
+        assertEquals(userRequestDTO.birthDate(), receivedUser.birthDate());
+        assertEquals(userRequestDTO.balance(), receivedUser.balance());
     }
-
 
     @Test
     void itShouldReturnOkStatusWhenGetAllUsers() throws Exception {
@@ -101,10 +145,10 @@ class UserControllerIT {
 
     @Test
     void itShouldBeAbleToGetUserById() throws Exception {
-        String userJsonString = objectMapper.writeValueAsString(user);
+        String responseUserDTOJsonString = objectMapper.writeValueAsString(responseUserDTO);
 
         RequestBuilder requestBuilder = get(urlRequestUserById);
-        ResultMatcher matchResponse = content().json(userJsonString);
+        ResultMatcher matchResponse = content().json(responseUserDTOJsonString);
 
         mockMvc.perform(requestBuilder).andExpectAll(matchResponse);
     }
@@ -146,9 +190,9 @@ class UserControllerIT {
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         String content = result.getResponse().getContentAsString();
-        User createdUser = objectMapper.readValue(content, User.class);
+        ResponseUserDTO createdUser = objectMapper.readValue(content, ResponseUserDTO.class);
 
-        assertRequestDTOEqualsUser(validUserDTO, createdUser);
+        assertResponseUserDTO(validUserDTO, createdUser);
     }
 
     @Test
@@ -161,9 +205,9 @@ class UserControllerIT {
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         String content = result.getResponse().getContentAsString();
-        User updatedUser = objectMapper.readValue(content, User.class);
+        ResponseUserDTO updatedUser = objectMapper.readValue(content, ResponseUserDTO.class);
 
-        assertRequestDTOEqualsUser(validUserDTO, updatedUser);
+        assertResponseUserDTO(validUserDTO, updatedUser);
     }
 
     @Test
@@ -209,6 +253,115 @@ class UserControllerIT {
     void itShouldReturnNoContentStatusWhenDeleteUserDoesNotExists() throws Exception {
         RequestBuilder requestBuilder = delete(urlRequestInvalidUser);
         ResultMatcher matchStatus = status().isNoContent();
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePostInvalidUserEmail() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidEmailUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePutInvalidUserEmail() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidEmailUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldReturnConflictStatusWhenPostDuplicatedUsername() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+
+        ResultMatcher matchStatus = status().isConflict();
+        mockMvc.perform(requestBuilder);
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePostInvalidUserPassword() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidPasswordUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePutInvalidUserPassword() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidPasswordUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePostInvalidUserAge() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidAgeUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePutInvalidUserAge() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidAgeUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePostInvalidUserBalance() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidBalanceUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePutInvalidUserBalance() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidBalanceUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
     }
 }
