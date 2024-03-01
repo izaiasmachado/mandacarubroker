@@ -313,6 +313,18 @@ class UserControllerIT {
     }
 
     @Test
+    void itShouldHandlePutInvalidUserPassword() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidPasswordUserDTO);
+
+        RequestBuilder requestBuilder = put(urlRequestUserById)
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
     void itShouldHandlePostInvalidUserAge() throws Exception {
         String userJsonString = objectMapper.writeValueAsString(invalidAgeUserDTO);
 
