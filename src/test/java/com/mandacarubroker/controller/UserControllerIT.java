@@ -2,6 +2,7 @@ package com.mandacarubroker.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mandacarubroker.domain.user.RequestUserDTO;
+import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
 import com.mandacarubroker.service.UserService;
@@ -64,12 +65,19 @@ class UserControllerIT {
     private User user;
     private String userId;
     private String urlRequestUserById;
+    private ResponseUserDTO responseUserDTO;
 
     @BeforeEach
     void setUp() {
-        user = service.getAllUsers().get(0);
+        user = userRepository.findAll().get(0);
         userId = user.getId();
         urlRequestUserById = "/users/" + userId;
+        responseUserDTO = new ResponseUserDTO(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBirthDate(),
+                user.getBalance()
+        );
     }
 
     @AfterEach
@@ -80,15 +88,12 @@ class UserControllerIT {
         }
     }
 
-    void assertRequestDTOEqualsUser(final RequestUserDTO userDTO, final User receivedUser) {
-        assertEquals(userDTO.email(), receivedUser.getEmail());
-        assertEquals(userDTO.username(), receivedUser.getUsername());
-        assertEquals(userDTO.firstName(), receivedUser.getFirstName());
-        assertEquals(userDTO.lastName(), receivedUser.getLastName());
-        assertEquals(userDTO.birthDate(), receivedUser.getBirthDate());
-        assertEquals(userDTO.balance(), receivedUser.getBalance());
+    void assertResponseUserDTO(final RequestUserDTO userRequestDTO, final ResponseUserDTO receivedUser){
+        assertEquals(userRequestDTO.firstName(), receivedUser.firstName());
+        assertEquals(userRequestDTO.lastName(), receivedUser.lastName());
+        assertEquals(userRequestDTO.birthDate(), receivedUser.birthDate());
+        assertEquals(userRequestDTO.balance(), receivedUser.balance());
     }
-
 
     @Test
     void itShouldReturnOkStatusWhenGetAllUsers() throws Exception {
@@ -110,10 +115,10 @@ class UserControllerIT {
 
     @Test
     void itShouldBeAbleToGetUserById() throws Exception {
-        String userJsonString = objectMapper.writeValueAsString(user);
+        String responseUserDTOJsonString = objectMapper.writeValueAsString(responseUserDTO);
 
         RequestBuilder requestBuilder = get(urlRequestUserById);
-        ResultMatcher matchResponse = content().json(userJsonString);
+        ResultMatcher matchResponse = content().json(responseUserDTOJsonString);
 
         mockMvc.perform(requestBuilder).andExpectAll(matchResponse);
     }
@@ -155,9 +160,9 @@ class UserControllerIT {
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         String content = result.getResponse().getContentAsString();
-        User createdUser = objectMapper.readValue(content, User.class);
+        ResponseUserDTO createdUser = objectMapper.readValue(content, ResponseUserDTO.class);
 
-        assertRequestDTOEqualsUser(validUserDTO, createdUser);
+        assertResponseUserDTO(validUserDTO, createdUser);
     }
 
     @Test
@@ -170,9 +175,9 @@ class UserControllerIT {
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         String content = result.getResponse().getContentAsString();
-        User updatedUser = objectMapper.readValue(content, User.class);
+        ResponseUserDTO updatedUser = objectMapper.readValue(content, ResponseUserDTO.class);
 
-        assertRequestDTOEqualsUser(validUserDTO, updatedUser);
+        assertResponseUserDTO(validUserDTO, updatedUser);
     }
 
     @Test
