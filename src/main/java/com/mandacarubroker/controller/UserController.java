@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseUserDTO> updateUser(@PathVariable @Valid final String id, @RequestBody final RequestUserDTO updatedUserDTO) {
+    public ResponseEntity<ResponseUserDTO> updateUser(@PathVariable final String id, @RequestBody @Valid final RequestUserDTO updatedUserDTO) {
         Optional<ResponseUserDTO> updatedUser = userService.updateUser(id, updatedUserDTO);
 
         if (updatedUser.isEmpty()) {
