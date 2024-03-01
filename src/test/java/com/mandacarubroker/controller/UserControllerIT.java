@@ -78,6 +78,16 @@ class UserControllerIT {
             0.25
     );
 
+    private final RequestUserDTO invalidBalanceUserDTO = new RequestUserDTO(
+            "marcosloiola@yahoo.com",
+            "Marcos24",
+            "passmarco123",
+            "Marcos",
+            "Loiola",
+            LocalDate.of(2001, 3, 2),
+            -0.001
+    );
+
     private final RequestUserDTO validUserDTO = new RequestUserDTO(
             validEmail,
             validUsername,
@@ -293,6 +303,18 @@ class UserControllerIT {
     @Test
     void itShouldHandlePostInvalidUserAge() throws Exception {
         String userJsonString = objectMapper.writeValueAsString(invalidAgeUserDTO);
+
+        RequestBuilder requestBuilder = post("/users")
+                .contentType("application/json")
+                .content(userJsonString);
+        ResultMatcher matchStatus = status().isBadRequest();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
+
+    @Test
+    void itShouldHandlePostInvalidUserBalance() throws Exception {
+        String userJsonString = objectMapper.writeValueAsString(invalidBalanceUserDTO);
 
         RequestBuilder requestBuilder = post("/users")
                 .contentType("application/json")
