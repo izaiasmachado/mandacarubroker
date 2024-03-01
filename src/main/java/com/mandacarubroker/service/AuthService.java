@@ -30,7 +30,7 @@ public class AuthService {
             return Optional.empty();
         }
 
-        String userId = user.get().getId();
+        String userId = user.get().getUsername();
         ResponseAuthUserDTO responseAuthUserDTO = tokenService.encodeToken(userId);
         return Optional.of(responseAuthUserDTO);
     }

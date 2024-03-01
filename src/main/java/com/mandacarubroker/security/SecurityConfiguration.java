@@ -33,7 +33,7 @@ public class SecurityConfiguration {
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .authorizeHttpRequests(req -> {
                 req.requestMatchers(WHITE_LIST_URL).permitAll();
-                req.anyRequest().permitAll();
+                req.anyRequest().authenticated();
             })
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

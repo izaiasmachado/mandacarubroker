@@ -70,7 +70,7 @@ class AuthServiceTest {
         Mockito.when(passwordHashingService.matches(invalidPassword, validHashedPassword)).thenReturn(false);
 
         tokenService = Mockito.mock(TokenService.class);
-        Mockito.when(tokenService.encodeToken(validUser.getId())).thenReturn(new ResponseAuthUserDTO(validToken, expiresIn, tokenType));
+        Mockito.when(tokenService.encodeToken(validUser.getUsername())).thenReturn(new ResponseAuthUserDTO(validToken, expiresIn, tokenType));
 
         authService = new AuthService(userRepository, passwordHashingService, tokenService);
     }
