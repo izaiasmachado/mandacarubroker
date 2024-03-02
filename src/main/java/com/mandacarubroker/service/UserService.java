@@ -110,4 +110,9 @@ public class UserService implements UserDetailsService {
         User alreadyExistingUser = userRepository.findByUsername(userName);
         return alreadyExistingUser != null;
     }
+
+    public Optional<ResponseUserDTO> findByUsername(final String username) {
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username));
+        return user.map(this::userToResponseUserDTO);
+    }
 }
