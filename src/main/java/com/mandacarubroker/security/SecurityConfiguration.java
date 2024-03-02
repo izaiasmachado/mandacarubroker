@@ -50,7 +50,7 @@ public class SecurityConfiguration {
                     req.requestMatchers(GET, "/stocks/**").hasAuthority(STOCKS_READ.getPermission());
                     req.requestMatchers(POST, "/stocks").hasAuthority(STOCKS_CREATE.getPermission());
                     req.requestMatchers(PUT, "/stocks/**").hasAuthority(STOCKS_UPDATE.getPermission());
-                    req.requestMatchers(PUT, "/stocks/**").hasAuthority(STOCKS_DELETE.getPermission());
+                    req.requestMatchers(DELETE, "/stocks/**").hasAuthority(STOCKS_DELETE.getPermission());
                     req.requestMatchers(POST, "/users").permitAll();
                     req.requestMatchers(GET, "/users").hasAuthority(USER_READ.getPermission());
                     req.requestMatchers(GET, "/users/**").hasAuthority(USER_READ.getPermission());
@@ -61,6 +61,7 @@ public class SecurityConfiguration {
                 })
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
