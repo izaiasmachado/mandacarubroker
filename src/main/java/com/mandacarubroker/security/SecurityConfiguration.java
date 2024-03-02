@@ -34,6 +34,7 @@ public class SecurityConfiguration {
             "/",
             "/auth/login",
             "/auth/register",
+            "/auth/me"
     };
 
     private final AuthenticationProvider authenticationProvider;
@@ -55,6 +56,7 @@ public class SecurityConfiguration {
                     req.requestMatchers(GET, "/users/**").hasAuthority(USER_READ.getPermission());
                     req.requestMatchers(PUT, "/users/**").hasAuthority(USER_UPDATE.getPermission());
                     req.requestMatchers(DELETE, "/users/**").hasAuthority(USER_DELETE.getPermission());
+                    req.requestMatchers(GET, "/auth/me").authenticated();
                     req.anyRequest().authenticated();
                 })
                 .authenticationProvider(authenticationProvider)
