@@ -72,13 +72,15 @@ class UserControllerIT {
                         "Loiola",
                         LocalDate.of(2002, 2, 26),
                         0.25);
+
+        private final int currentYear = LocalDate.now().getYear();
         private final RequestUserDTO invalidAgeUserDTO = new RequestUserDTO(
                         "marcosloiola@yahoo.com",
                         "Marcos23",
                         "passmarco123",
                         "Marcos",
                         "Loiola",
-                        LocalDate.of(2006, 3, 2),
+                        LocalDate.of(currentYear, 1, 1),
                         0.25);
 
         private final RequestUserDTO invalidBalanceUserDTO = new RequestUserDTO(
