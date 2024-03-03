@@ -26,7 +26,6 @@ public class PortfolioServiceTest {
 
     private PortfolioService portfolioService;
 
-
     private final RequestUserDTO validRequestUserDTO = new RequestUserDTO(
             "marcosloiola@yahoo.com",
             "Marcos22",
