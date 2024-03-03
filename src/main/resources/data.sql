@@ -15,3 +15,8 @@ VALUES
     ('b2d13c5a-7df0-4673-b3e6-49244f395ac1', 'ana.silva@gmail.com', 'AnaSilva', 'xyz789', 'Ana', 'Silva', '1995-03-21', 300.50),
     ('b2d13c5a-9df0-4673-b3e6-49244f395ac6', 'patricia.santos@hotmail.com', 'PatriciaS', 'pass123', 'Patricia', 'Santos', '1998-08-30', 250.75)
     ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO users (id, email, username, password, first_name, last_name, birth_date, balance, role)
+VALUES
+    ('b2d13c5a-3df0-4673-b3e6-49244f395ac7', 'admin@example.com', 'admin', '$2a$10$oUmo9dGdjnbdWeYlq7tsNuZo/r.pwI6T8JbEu2bp26Y5Zg7uzrKMy', 'Ademir', 'Ademilson', '2002-01-01', 777.7, 'ADMIN')
+    ON CONFLICT (id) DO NOTHING;

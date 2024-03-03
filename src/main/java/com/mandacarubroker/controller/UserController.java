@@ -2,8 +2,9 @@ package com.mandacarubroker.controller;
 
 
 import com.mandacarubroker.domain.user.RequestUserDTO;
-import com.mandacarubroker.domain.user.User;
+import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,13 +31,13 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<ResponseUserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable final String id) {
-        Optional<User> user = userService.getUserById(id);
+    public ResponseEntity<ResponseUserDTO> getUserById(@PathVariable final String id) {
+        Optional<ResponseUserDTO> user = userService.getUserById(id);
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -44,14 +45,17 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody final RequestUserDTO requestUserDTO) {
-        User createdUser = userService.createUser(requestUserDTO);
+    public ResponseEntity<ResponseUserDTO> createUser(@RequestBody @Valid final RequestUserDTO requestUserDTO) {
+        if (userService.verifyDuplicateUsername(requestUserDTO.username())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        ResponseUserDTO createdUser = userService.createUser(requestUserDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable final String id, @RequestBody final RequestUserDTO updatedUserDTO) {
-        Optional<User> updatedUser = userService.updateUser(id, updatedUserDTO);
+    public ResponseEntity<ResponseUserDTO> updateUser(@PathVariable final String id, @RequestBody @Valid final RequestUserDTO updatedUserDTO) {
+        Optional<ResponseUserDTO> updatedUser = userService.updateUser(id, updatedUserDTO);
 
         if (updatedUser.isEmpty()) {
             return ResponseEntity.notFound().build();

@@ -2,9 +2,10 @@ package com.mandacarubroker.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import com.mandacarubroker.domain.user.RequestUserDTO;
+import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
+import com.mandacarubroker.domain.user.UserRepository;
 import com.mandacarubroker.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,207 +13,376 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static com.mandacarubroker.domain.user.Permission.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerIT {
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @Autowired
-    private UserService service;
+        @Autowired
+        private UserService service;
 
-    private final String validEmail = "lara.souza@gmail.com";
-    private final String validUsername = "LaraS";
-    private final String validPassword = "pass555";
-    private final String validFirstName = "Lara";
-    private final String validLastName = "Souza";
-    private final LocalDate validBirthDate = LocalDate.of(1997,4,5);
-    private final double validBalance = 90.50;
+        private final String validEmail = "lara.souza@gmail.com";
+        private final String validUsername = "LaraSoU";
+        private final String validPassword = "#pass555";
+        private final String validFirstName = "Lara";
+        private final String validLastName = "Souza";
+        private final LocalDate validBirthDate = LocalDate.of(2006, 2, 28);
+        private final double validBalance = 90.50;
+        private final RequestUserDTO invalidEmailUserDTO = new RequestUserDTO(
+                        "marcosloiola@.yahoo.com",
+                        "Marcos22",
+                        "passmarco123",
+                        "Marcos",
+                        "Loiola",
+                        LocalDate.of(2002, 2, 26),
+                        0.25);
+        private final RequestUserDTO invalidPasswordUserDTO = new RequestUserDTO(
+                        "marcosloiola@yahoo.com",
+                        "Marcos23",
+                        "pass123",
+                        "Marcos",
+                        "Loiola",
+                        LocalDate.of(2002, 2, 26),
+                        0.25);
 
-    private final RequestUserDTO validUserDTO = new RequestUserDTO(
-            validEmail,
-            validUsername,
-            validPassword,
-            validFirstName,
-            validLastName,
-            validBirthDate,
-            validBalance
-    );
+        private final int currentYear = LocalDate.now().getYear();
+        private final RequestUserDTO invalidAgeUserDTO = new RequestUserDTO(
+                        "marcosloiola@yahoo.com",
+                        "Marcos23",
+                        "passmarco123",
+                        "Marcos",
+                        "Loiola",
+                        LocalDate.of(currentYear, 1, 1),
+                        0.25);
 
-    private final String urlRequestInvalidUser = "/users/dummy-user-id";
-    private User user;
-    private String userId;
-    private String urlRequestUserById;
+        private final RequestUserDTO invalidBalanceUserDTO = new RequestUserDTO(
+                        "marcosloiola@yahoo.com",
+                        "Marcos24",
+                        "passmarco123",
+                        "Marcos",
+                        "Loiola",
+                        LocalDate.of(2001, 3, 2),
+                        -0.001);
 
-    @BeforeEach
-    void setUp() {
-        user = service.getAllUsers().get(0);
-        userId = user.getId();
-        urlRequestUserById = "/users/" + userId;
-    }
+        private final RequestUserDTO validUserDTO = new RequestUserDTO(
+                        validEmail,
+                        validUsername,
+                        validPassword,
+                        validFirstName,
+                        validLastName,
+                        validBirthDate,
+                        validBalance);
 
-    @AfterEach
-    void tearDown() {
-    }
+        private final String urlRequestInvalidUser = "/users/dummy-user-id";
+        private User user;
+        private String userId;
+        private String urlRequestUserById;
+        private ResponseUserDTO responseUserDTO;
 
-    void assertRequestDTOEqualsUser(final RequestUserDTO userDTO, final User receivedUser) {
-        assertEquals(userDTO.email(), receivedUser.getEmail());
-        assertEquals(userDTO.username(), receivedUser.getUsername());
-        assertEquals(userDTO.password(), receivedUser.getPassword());
-        assertEquals(userDTO.firstName(), receivedUser.getFirstName());
-        assertEquals(userDTO.lastName(), receivedUser.getLastName());
-        assertEquals(userDTO.birthDate(), receivedUser.getBirthDate());
-        assertEquals(userDTO.balance(), receivedUser.getBalance());
-    }
+        @BeforeEach
+        void setUp() {
+                Collection<SimpleGrantedAuthority> authorities = Set.of(
+                                new SimpleGrantedAuthority(USER_CREATE.getPermission()),
+                                new SimpleGrantedAuthority(USER_READ.getPermission()),
+                                new SimpleGrantedAuthority(USER_UPDATE.getPermission()),
+                                new SimpleGrantedAuthority(USER_DELETE.getPermission()));
+                Authentication authentication = new TestingAuthenticationToken("user", "password", authorities);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
+                user = userRepository.findAll().get(0);
+                userId = user.getId();
+                urlRequestUserById = "/users/" + userId;
+                responseUserDTO = new ResponseUserDTO(
+                                user.getId(),
+                                user.getEmail(),
+                                user.getUsername(),
+                                user.getFirstName(),
+                                user.getLastName(),
+                                user.getBirthDate(),
+                                user.getBalance()
+                );
+        }
 
-    @Test
-    void itShouldReturnOkStatusWhenGetAllUsers() throws Exception {
-        RequestBuilder requestBuilder = get("/users");
-        ResultMatcher resultMatcher = status().isOk();
-        mockMvc.perform(requestBuilder).andExpect(resultMatcher);
-    }
+        @AfterEach
+        void tearDown() {
+                User alreadyExistentUser = userRepository.findByUsername(validUsername);
+                if (alreadyExistentUser != null) {
+                        service.deleteUser(alreadyExistentUser.getId());
+                }
+        }
 
-    @Test
-    void itShouldBeAbleToGetAllUsers() throws Exception {
-        RequestBuilder requestBuilder = get("/users");
+        void assertResponseUserDTO(final RequestUserDTO userRequestDTO, final ResponseUserDTO receivedUser) {
+                assertEquals(userRequestDTO.email(), receivedUser.email());
+                assertEquals(userRequestDTO.username(), receivedUser.username());
+                assertEquals(userRequestDTO.firstName(), receivedUser.firstName());
+                assertEquals(userRequestDTO.lastName(), receivedUser.lastName());
+                assertEquals(userRequestDTO.birthDate(), receivedUser.birthDate());
+                assertEquals(userRequestDTO.balance(), receivedUser.balance());
+        }
 
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-        String content = result.getResponse().getContentAsString();
-        List<User> users = objectMapper.readValue(content, List.class);
+        @Test
+        void itShouldReturnOkStatusWhenGetAllUsers() throws Exception {
+                RequestBuilder requestBuilder = get("/users");
+                ResultMatcher resultMatcher = status().isOk();
+                mockMvc.perform(requestBuilder).andExpect(resultMatcher);
+        }
 
-        assertEquals(service.getAllUsers().size(), users.size());
-    }
+        @Test
+        void itShouldBeAbleToGetAllUsers() throws Exception {
+                RequestBuilder requestBuilder = get("/users");
 
-    @Test
-    void itShouldBeAbleToGetUserById() throws Exception {
-        String userJsonString = objectMapper.writeValueAsString(user);
+                MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+                String content = result.getResponse().getContentAsString();
+                List<User> users = objectMapper.readValue(content, List.class);
 
-        RequestBuilder requestBuilder = get(urlRequestUserById);
-        ResultMatcher matchResponse = content().json(userJsonString);
+                assertEquals(service.getAllUsers().size(), users.size());
+        }
 
-        mockMvc.perform(requestBuilder).andExpectAll(matchResponse);
-    }
+        @Test
+        void itShouldBeAbleToGetUserById() throws Exception {
+                String responseUserDTOJsonString = objectMapper.writeValueAsString(responseUserDTO);
 
-    @Test
-    void itShouldReturnOkStatusWhenGetUserById() throws Exception {
-        RequestBuilder requestBuilder = get(urlRequestUserById);
-        ResultMatcher matchStatus = status().isOk();
+                RequestBuilder requestBuilder = get(urlRequestUserById);
+                ResultMatcher matchResponse = content().json(responseUserDTOJsonString);
 
-        mockMvc.perform(requestBuilder).andExpect(matchStatus);
-    }
+                mockMvc.perform(requestBuilder).andExpectAll(matchResponse);
+        }
 
-    @Test
-    void itShouldReturnNotFoundWhenGetUserDoesNotExists() throws Exception {
-        RequestBuilder requestBuilder = get(urlRequestInvalidUser);
-        ResultMatcher matchStatus = status().isNotFound();
-        mockMvc.perform(requestBuilder).andExpect(matchStatus);
-    }
+        @Test
+        void itShouldReturnOkStatusWhenGetUserById() throws Exception {
+                RequestBuilder requestBuilder = get(urlRequestUserById);
+                ResultMatcher matchStatus = status().isOk();
 
-    @Test
-    void itShouldReturnCreatedStatusAfterSucessfulPost() throws Exception {
-        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
 
-        RequestBuilder requestBuilder = post("/users")
-                .contentType("application/json")
-                .content(userJsonString);
-        ResultMatcher matchStatus = status().isCreated();
+        @Test
+        void itShouldReturnNotFoundWhenGetUserDoesNotExists() throws Exception {
+                RequestBuilder requestBuilder = get(urlRequestInvalidUser);
+                ResultMatcher matchStatus = status().isNotFound();
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
 
-        mockMvc.perform(requestBuilder).andExpect(matchStatus);
-    }
+        @Test
+        void itShouldReturnCreatedStatusAfterSucessfulPost() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(validUserDTO);
 
-    @Test
-    void itShouldReturnUserDataAfterSucessfulPost() throws Exception {
-        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+                RequestBuilder requestBuilder = post("/users")
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isCreated();
 
-        RequestBuilder requestBuilder = post("/users")
-                .contentType("application/json")
-                .content(userJsonString);
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
 
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-        String content = result.getResponse().getContentAsString();
-        User createdUser = objectMapper.readValue(content, User.class);
+        void itShouldReturnUserDataAfterSucessfulPost() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+                System.out.println(userJsonString);
+                RequestBuilder requestBuilder = post("/users")
+                                .contentType("application/json")
+                                .content(userJsonString);
 
-        assertRequestDTOEqualsUser(validUserDTO, createdUser);
-    }
+                MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+                String content = result.getResponse().getContentAsString();
+                ResponseUserDTO createdUser = objectMapper.readValue(content, ResponseUserDTO.class);
 
-    @Test
-    void itShouldReturnUserDataAfterSucessfulPut() throws Exception {
-        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+                assertResponseUserDTO(validUserDTO, createdUser);
+        }
 
-        RequestBuilder requestBuilder = put(urlRequestUserById)
-                .contentType("application/json")
-                .content(userJsonString);
+        void itShouldReturnUserDataAfterSucessfulPut() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(validUserDTO);
 
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-        String content = result.getResponse().getContentAsString();
-        User updatedUser = objectMapper.readValue(content, User.class);
+                RequestBuilder requestBuilder = put(urlRequestUserById)
+                                .contentType("application/json")
+                                .content(userJsonString);
 
-        assertRequestDTOEqualsUser(validUserDTO, updatedUser);
-    }
+                MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+                String content = result.getResponse().getContentAsString();
+                ResponseUserDTO updatedUser = objectMapper.readValue(content, ResponseUserDTO.class);
 
-    @Test
-    void itShouldReturnOkStatusAfterSucessfulPut() throws Exception {
-        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+                assertResponseUserDTO(validUserDTO, updatedUser);
+        }
 
-        RequestBuilder requestBuilder = put(urlRequestUserById)
-                .contentType("application/json")
-                .content(userJsonString);
-        ResultMatcher matchStatus = status().isOk();
+        @Test
+        void itShouldReturnOkStatusAfterSucessfulPut() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(validUserDTO);
 
-        mockMvc.perform(requestBuilder).andExpect(matchStatus);
-    }
+                RequestBuilder requestBuilder = put(urlRequestUserById)
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isOk();
 
-    @Test
-    void itShouldReturnNotFoundWhenPutUserDoesNotExists() throws Exception {
-        String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
 
-        RequestBuilder requestBuilder = put(urlRequestInvalidUser)
-                .contentType("application/json")
-                .content(userJsonString);
-        ResultMatcher matchStatus = status().isNotFound();
+        @Test
+        void itShouldReturnNotFoundWhenPutUserDoesNotExists() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(validUserDTO);
 
-        mockMvc.perform(requestBuilder).andExpect(matchStatus);
-    }
+                RequestBuilder requestBuilder = put(urlRequestInvalidUser)
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isNotFound();
 
-    @Test
-    void itShouldBeAbleToDeleteUser() throws Exception {
-        RequestBuilder requestBuilder = delete(urlRequestUserById);
-        ResultMatcher matchStatus = status().isNoContent();
-        mockMvc.perform(requestBuilder).andExpect(matchStatus);
-        assertEquals(Optional.empty(), service.getUserById(userId));
-    }
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
 
-    @Test
-    void itShouldReturnNoContentStatusWhenDeleteUser() throws Exception {
-        RequestBuilder requestBuilder = delete(urlRequestUserById);
-        ResultMatcher matchStatus = status().isNoContent();
-        mockMvc.perform(requestBuilder).andExpect(matchStatus);
-    }
+        @Test
+        void itShouldBeAbleToDeleteUser() throws Exception {
+                RequestBuilder requestBuilder = delete(urlRequestUserById);
+                ResultMatcher matchStatus = status().isNoContent();
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+                assertEquals(Optional.empty(), service.getUserById(userId));
+        }
 
-    @Test
-    void itShouldReturnNoContentStatusWhenDeleteUserDoesNotExists() throws Exception {
-        RequestBuilder requestBuilder = delete(urlRequestInvalidUser);
-        ResultMatcher matchStatus = status().isNoContent();
-        mockMvc.perform(requestBuilder).andExpect(matchStatus);
-    }
+        @Test
+        void itShouldReturnNoContentStatusWhenDeleteUser() throws Exception {
+                RequestBuilder requestBuilder = delete(urlRequestUserById);
+                ResultMatcher matchStatus = status().isNoContent();
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldReturnNoContentStatusWhenDeleteUserDoesNotExists() throws Exception {
+                RequestBuilder requestBuilder = delete(urlRequestInvalidUser);
+                ResultMatcher matchStatus = status().isNoContent();
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldHandlePostInvalidUserEmail() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(invalidEmailUserDTO);
+
+                RequestBuilder requestBuilder = post("/users")
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isBadRequest();
+
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldHandlePutInvalidUserEmail() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(invalidEmailUserDTO);
+
+                RequestBuilder requestBuilder = put(urlRequestUserById)
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isBadRequest();
+
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldReturnConflictStatusWhenPostDuplicatedUsername() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(validUserDTO);
+
+                RequestBuilder requestBuilder = post("/users")
+                                .contentType("application/json")
+                                .content(userJsonString);
+
+                ResultMatcher matchStatus = status().isConflict();
+                mockMvc.perform(requestBuilder);
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldHandlePostInvalidUserPassword() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(invalidPasswordUserDTO);
+
+                RequestBuilder requestBuilder = post("/users")
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isBadRequest();
+
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldHandlePutInvalidUserPassword() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(invalidPasswordUserDTO);
+
+                RequestBuilder requestBuilder = put(urlRequestUserById)
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isBadRequest();
+
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldHandlePostInvalidUserAge() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(invalidAgeUserDTO);
+
+                RequestBuilder requestBuilder = post("/users")
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isBadRequest();
+
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldHandlePutInvalidUserAge() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(invalidAgeUserDTO);
+
+                RequestBuilder requestBuilder = put(urlRequestUserById)
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isBadRequest();
+
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldHandlePostInvalidUserBalance() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(invalidBalanceUserDTO);
+
+                RequestBuilder requestBuilder = post("/users")
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isBadRequest();
+
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
+
+        @Test
+        void itShouldHandlePutInvalidUserBalance() throws Exception {
+                String userJsonString = objectMapper.writeValueAsString(invalidBalanceUserDTO);
+
+                RequestBuilder requestBuilder = put(urlRequestUserById)
+                                .contentType("application/json")
+                                .content(userJsonString);
+                ResultMatcher matchStatus = status().isBadRequest();
+
+                mockMvc.perform(requestBuilder).andExpect(matchStatus);
+        }
 }
