@@ -135,28 +135,4 @@ public class UserService implements UserDetailsService {
         Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username));
         return user.map(this::userToResponseUserDTO);
     }
-
-    public ResponseUserDTO doDepositForAuthenticatedUser(final double amount) {
-        User user = AuthService.getAuthenticatedUser();
-        return doDeposit(user, amount);
-    }
-
-    public ResponseUserDTO doDeposit(final User user, final double amount) {
-        user.deposit(amount);
-        User updatedUser = userRepository.save(user);
-        ResponseUserDTO responseUserDTO = userToResponseUserDTO(updatedUser);
-        return responseUserDTO;
-    }
-
-    public ResponseUserDTO doWithdrawForAuthenticatedUser(final double amount) {
-        User user = AuthService.getAuthenticatedUser();
-        return doWithdraw(user, amount);
-    }
-
-    public ResponseUserDTO doWithdraw(final User user, final double amount) {
-        user.withdraw(amount);
-        User updatedUser = userRepository.save(user);
-        ResponseUserDTO responseUserDTO = userToResponseUserDTO(updatedUser);
-        return responseUserDTO;
-    }
 }
