@@ -57,9 +57,6 @@ public class PortfolioServiceTest {
     void setUp() {
         SecuritySecretsMock.mockStatic();
 
-        mockStatic(AuthService.class);
-        Mockito.when(AuthService.getAuthenticatedUser()).thenReturn(validUser);
-
         stockPositionRepository = Mockito.mock(StockOwnershipRepository.class);
         Mockito.when(stockPositionRepository.findByUserId(validUser.getId())).thenReturn(givenStockOwnerships);
 
@@ -68,7 +65,21 @@ public class PortfolioServiceTest {
 
     @Test
     void itShouldReturnTheStockPortfolioOfTheAuthenticatedUser() {
+        mockStatic(AuthService.class);
+        Mockito.when(AuthService.getAuthenticatedUser()).thenReturn(validUser);
+
         List<ResponseStockOwnershipDTO> stockPortfolio = portfolioService.getAuthenticatedUserStockPortfolio();
+
+        for (int i = 0; i < stockPortfolio.size(); i++) {
+            assertEquals(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
+            assertEquals(stockPortfolio.get(i).totalShares(), this.storedStockPortfolio.get(i).totalShares());
+            assertEquals(stockPortfolio.get(i).positionValue(), this.storedStockPortfolio.get(i).positionValue());
+        }
+    }
+
+    @Test
+    void itShouldBeAbleToGetStockPortfolioByUserId() {
+        List<ResponseStockOwnershipDTO> stockPortfolio = portfolioService.getPortfolioByUserId(validUser.getId());
 
         for (int i = 0; i < stockPortfolio.size(); i++) {
             assertEquals(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
