@@ -88,26 +88,6 @@ public class UserService implements UserDetailsService {
                 });
     }
 
-    public Optional<User> deposit(final String userId, final double amount) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (!userOptional.isPresent()) {
-            return Optional.empty();
-        }
-        User user = userOptional.get();
-        user.deposit(amount);
-        return Optional.of(userRepository.save(user));
-    }
-
-    public Optional<User> withdraw(final String userId, final double amount) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            return Optional.empty();
-        }
-        User user = userOptional.get();
-        user.withdraw(amount);
-        return Optional.of(userRepository.save(user));
-    }
-
     public void deleteUser(final String id) {
         userRepository.deleteById(id);
     }
