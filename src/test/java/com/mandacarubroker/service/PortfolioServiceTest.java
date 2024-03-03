@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mandacarubroker.domain.stock.StockUtils.assertStocksAreEqual;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mockStatic;
 
@@ -70,7 +71,7 @@ public class PortfolioServiceTest {
         List<ResponseStockOwnershipDTO> stockPortfolio = portfolioService.getAuthenticatedUserStockPortfolio();
 
         for (int i = 0; i < stockPortfolio.size(); i++) {
-            assertEquals(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
+            assertStocksAreEqual(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
             assertEquals(stockPortfolio.get(i).totalShares(), this.storedStockPortfolio.get(i).totalShares());
             assertEquals(stockPortfolio.get(i).positionValue(), this.storedStockPortfolio.get(i).positionValue());
         }
@@ -81,7 +82,7 @@ public class PortfolioServiceTest {
         List<ResponseStockOwnershipDTO> stockPortfolio = portfolioService.getPortfolioByUserId(validUser.getId());
 
         for (int i = 0; i < stockPortfolio.size(); i++) {
-            assertEquals(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
+            assertStocksAreEqual(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
             assertEquals(stockPortfolio.get(i).totalShares(), this.storedStockPortfolio.get(i).totalShares());
             assertEquals(stockPortfolio.get(i).positionValue(), this.storedStockPortfolio.get(i).positionValue());
         }
