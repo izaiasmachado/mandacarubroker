@@ -19,6 +19,10 @@ public class AccountService {
     }
 
     public ResponseUserDTO doDeposit(final User user, final double amount) {
+        if (amount <= 0) {
+            return null;
+        }
+
         user.deposit(amount);
         User updatedUser = userRepository.save(user);
         ResponseUserDTO responseUserDTO = ResponseUserDTO.fromUser(updatedUser);
@@ -31,6 +35,10 @@ public class AccountService {
     }
 
     public ResponseUserDTO doWithdraw(final User user, final double amount) {
+        if (user.getBalance() < amount || amount <= 0) {
+            return null;
+        }
+
         user.withdraw(amount);
         User updatedUser = userRepository.save(user);
         ResponseUserDTO responseUserDTO = ResponseUserDTO.fromUser(updatedUser);
