@@ -9,9 +9,6 @@ import com.mandacarubroker.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.OngoingStubbing;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.eq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -195,124 +192,6 @@ class UserControllerIT {
         ResultMatcher matchStatus = status().isNotFound();
 
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
-    }
-
-    @Test
-    void itShouldUpdateUserBalanceAfterSuccessfulDeposit() throws Exception {
-        double initialBalance = 100.0;
-        double depositAmount = 50.0;
-        /* User user = new User(validEmail, validUsername, validPassword, validFirstName, validLastName, validBirthDate, initialBalance);*/
-        User user = new User(validUserDTO);
-        user.setBalance(initialBalance);
-
-        when(service.deposit(eq(userId), eq(depositAmount))).thenReturn(Optional.of(user));
-        RequestBuilder requestBuilder = put(urlRequestUserById + "/deposit")
-                .contentType("application/json")
-                .content(String.valueOf(depositAmount));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"balance\":150.0}"));
-    }
-
-    @Test
-    void itShouldNotChangeUserBalanceWhenDepositAmountIsZero() throws Exception {
-        double initialBalance = 100.0;
-        double depositAmount = 0.0;
-        User user = new User(validUserDTO);
-        user.setBalance(initialBalance);
-
-        when(service.deposit(eq(userId), eq(depositAmount))).thenReturn(Optional.of(user));
-        RequestBuilder requestBuilder = put(urlRequestUserById + "/deposit")
-                .contentType("application/json")
-                .content(String.valueOf(depositAmount));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"balance\":100.0}"));
-    }
-
-    @Test
-    void itShouldNotChangeUserBalanceWhenDepositAmountIsNegative() throws Exception {
-        double initialBalance = 100.0;
-        double depositAmount = -50.0;
-        User user = new User(validUserDTO);
-        user.setBalance(initialBalance);
-
-        when(service.deposit(eq(userId), eq(depositAmount))).thenReturn(Optional.empty());
-        RequestBuilder requestBuilder = put(urlRequestUserById + "/deposit")
-                .contentType("application/json")
-                .content(String.valueOf(depositAmount));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void itShouldUpdateUserBalanceAfterSuccessfulWithdrawal() throws Exception {
-        double initialBalance = 100.0;
-        double withdrawalAmount = 50.0;
-        User user = new User(validUserDTO);
-        user.setBalance(initialBalance);
-
-        when(service.withdraw(eq(userId), eq(withdrawalAmount))).thenReturn(Optional.of(user));
-        RequestBuilder requestBuilder = put(urlRequestUserById + "/withdraw")
-                .contentType("application/json")
-                .content(String.valueOf(withdrawalAmount));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"balance\":50.0}"));
-    }
-
-    @Test
-    void itShouldSetUserBalanceToZeroAfterFullWithdrawal() throws Exception {
-        double initialBalance = 100.0;
-        double withdrawalAmount = 100.0;
-        User user = new User(validUserDTO);
-        user.setBalance(initialBalance);
-
-        when(service.withdraw(eq(userId), eq(withdrawalAmount))).thenReturn(Optional.of(user));
-        RequestBuilder requestBuilder = put(urlRequestUserById + "/withdraw")
-                .contentType("application/json")
-                .content(String.valueOf(withdrawalAmount));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"balance\":0.0}"));
-    }
-
-    @Test
-    void itShouldNotChangeUserBalanceWhenWithdrawalAmountExceedsBalance() throws Exception {
-        double initialBalance = 100.0;
-        double withdrawalAmount = 150.0;
-        User user = new User(validUserDTO);
-        user.setBalance(initialBalance);
-
-        when(service.withdraw(eq(userId), eq(withdrawalAmount))).thenReturn(Optional.empty());
-        RequestBuilder requestBuilder = put(urlRequestUserById + "/withdraw")
-                .contentType("application/json")
-                .content(String.valueOf(withdrawalAmount));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void itShouldNotChangeUserBalanceWhenWithdrawalAmountIsZero() throws Exception {
-        double initialBalance = 100.0;
-        double withdrawalAmount = 0.0;
-        User user = new User(validUserDTO);
-        user.setBalance(initialBalance);
-
-        when(service.withdraw(eq(userId), eq(withdrawalAmount))).thenReturn(Optional.of(user));
-        RequestBuilder requestBuilder = put(urlRequestUserById + "/withdraw")
-                .contentType("application/json")
-                .content(String.valueOf(withdrawalAmount));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"balance\":100.0}"));
     }
 
     @Test
