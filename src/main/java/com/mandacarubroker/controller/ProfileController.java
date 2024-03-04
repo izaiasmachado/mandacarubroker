@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Optional;
 
+import static com.puppycrawl.tools.checkstyle.grammar.javadoc.JavadocLexer.exception;
+import static net.sf.saxon.om.EnumSetTool.except;
+
 @RestController
 @RequestMapping("/profile")
 public class ProfileController {
@@ -36,8 +39,7 @@ public class ProfileController {
         if (principal instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) principal;
             String userName = userDetails.getUsername();
-            String userId = userService.findByUsername(userName).get().id();
-            Optional<ResponseProfileDTO> updatedProfile = profileService.updateProfile(userId, updatedUserDTO);
+            Optional<ResponseProfileDTO> updatedProfile = profileService.updateProfile(userName, updatedUserDTO);
             return ResponseEntity.ok(updatedProfile.get());
         }
 
