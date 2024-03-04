@@ -1,5 +1,6 @@
 package com.mandacarubroker.service;
 
+import com.mandacarubroker.domain.stock.Stock;
 import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
@@ -19,9 +20,16 @@ import static com.mandacarubroker.validation.RecordValidation.validateRequestDTO
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordHashingService passwordHashingService = new PasswordHashingService();
+    private final StockService stockService;
+    private final PortfolioService portfolioService;
 
-    public UserService(final UserRepository recievedUserRepository) {
+    public UserService(final UserRepository recievedUserRepository,
+                       final StockService recievedstockService,
+                       final PortfolioService recievedPortfolioService
+                       ) {
         this.userRepository = recievedUserRepository;
+        this.stockService = recievedstockService;
+        this.portfolioService = recievedPortfolioService;
     }
 
     private ResponseUserDTO userToResponseUserDTO(final User user) {
@@ -115,4 +123,25 @@ public class UserService implements UserDetailsService {
         Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username));
         return user.map(this::userToResponseUserDTO);
     }
+
+    public ResponseUserDTO buyStock(final String stockId) {
+        User user = AuthService.getAuthenticatedUser();
+        Optional<Stock> stock = stockService.getStockById(stockId);
+
+        if (stock.isEmpty()) {
+            throw new IllegalStateException("Stock nonexistent");
+        }
+        if (user.getBalance() < stock.get().getPrice()) {
+            throw new IllegalStateException("Insufficient balance");
+        }
+
+        portfolioService.addStockInPortfolio(stock.get(), user);
+
+        user.setBalance(user.getBalance() - stock.get().getPrice());
+
+        return ResponseUserDTO.fromUser(userRepository.save(user));
+    }
+
+
 }
+

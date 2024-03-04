@@ -85,6 +85,14 @@ public class UserController {
         return ResponseEntity.ok(updatedUser.get());
     }
 
+
+    @GetMapping("/buy/{id}")
+    public ResponseEntity<ResponseUserDTO> buyStock(@PathVariable final String id) {
+        ResponseUserDTO user = userService.buyStock(id);
+        return ResponseEntity.ok(user);
+    }
+
+
     @Operation(summary = "Deleta um usuário", description = "Deleta um usuário cadastrado com base no id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable final String id) {
