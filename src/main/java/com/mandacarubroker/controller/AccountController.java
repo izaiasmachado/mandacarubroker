@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/account")
 public class AccountController {
@@ -20,23 +22,23 @@ public class AccountController {
 
     @GetMapping("/deposit")
     public ResponseEntity<ResponseUserDTO> deposit(@RequestParam @Positive final double amount) {
-        ResponseUserDTO user = accountService.doDepositForAuthenticatedUser(amount);
+        Optional<ResponseUserDTO> user = accountService.doDepositForAuthenticatedUser(amount);
 
-        if (user == null) {
+        if (user.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(user.get());
     }
 
     @GetMapping("/withdraw")
     public ResponseEntity<ResponseUserDTO> withdraw(@RequestParam @Positive final double amount) {
-        ResponseUserDTO user = accountService.doWithdrawForAuthenticatedUser(amount);
+        Optional<ResponseUserDTO> user = accountService.doWithdrawForAuthenticatedUser(amount);
 
-        if (user == null) {
+        if (user.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(user.get());
     }
 }
