@@ -27,7 +27,6 @@ public class ProfileService {
         return new ResponseProfileDTO(
                 user.getEmail(),
                 user.getUsername(),
-                user.getPassword(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBirthDate()
@@ -61,8 +60,6 @@ public class ProfileService {
         return userRepository.findById(userId)
                 .map(user -> {
                     user.setEmail(requestProfileDTO.email());
-                    user.setUsername(requestProfileDTO.username());
-                    user.setPassword(requestProfileDTO.password());
                     user.setFirstName(requestProfileDTO.firstName());
                     user.setLastName(requestProfileDTO.lastName());
                     user.setBirthDate(requestProfileDTO.birthDate());

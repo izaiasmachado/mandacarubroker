@@ -7,7 +7,6 @@ import com.mandacarubroker.service.ProfileService;
 import com.mandacarubroker.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +26,7 @@ public class ProfileController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<Object> updateUser(@RequestBody @Valid final RequestProfileDTO updatedUserDTO) {
+    public ResponseEntity<ResponseProfileDTO> updateUser(@Valid @RequestBody final RequestProfileDTO updatedUserDTO) {
         User user = AuthService.getAuthenticatedUser();
         String userName = user.getUsername();
         Optional<ResponseProfileDTO> updatedProfile = profileService.updateProfile(userName, updatedUserDTO);
