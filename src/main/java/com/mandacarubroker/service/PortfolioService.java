@@ -5,7 +5,6 @@ import com.mandacarubroker.domain.position.ResponseStockOwnershipDTO;
 import com.mandacarubroker.domain.position.StockOwnership;
 import com.mandacarubroker.domain.position.StockOwnershipRepository;
 import com.mandacarubroker.domain.stock.Stock;
-import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -116,7 +115,7 @@ public class PortfolioService {
         stockPositionRepository.deleteById(stockPositionId);
     }
 
-    public ResponseUserDTO buyStock(final String stockId, final RequestStockOwnershipDTO shares) {
+    public ResponseStockOwnershipDTO buyStock(final String stockId, final RequestStockOwnershipDTO shares) {
         User user = AuthService.getAuthenticatedUser();
         Optional<Stock> stock = stockService.getStockById(stockId);
 
@@ -128,14 +127,13 @@ public class PortfolioService {
         if (userBalance < stockBoughtPrice) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Insufficient balance");
         }
-
-        addStockPositionInPortfolio(stock.get(), user, shares);
+        ResponseStockOwnershipDTO boughtStockPosition = addStockPositionInPortfolio(stock.get(), user, shares);
         user.setBalance(userBalance - stockBoughtPrice);
-
-        return ResponseUserDTO.fromUser(userRepository.save(user));
+        userRepository.save(user);
+        return boughtStockPosition;
     }
 
-    public ResponseUserDTO sellStock(final String stockId, final RequestStockOwnershipDTO shares) {
+    public ResponseStockOwnershipDTO sellStock(final String stockId, final RequestStockOwnershipDTO shares) {
         User user = AuthService.getAuthenticatedUser();
         Optional<Stock> stock = stockService.getStockById(stockId);
         Optional<ResponseStockOwnershipDTO> userStockPosition = getStockPositionByUserIdAndStockId(stockId);
@@ -146,21 +144,30 @@ public class PortfolioService {
         int sharesToSell = shares.shares();
         int userShares = userStockPosition.get().totalShares();
         if (sharesToSell > userShares) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User with insufficient shares to sell");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "User with insufficient shares to sell");
         }
         double userBalance = user.getBalance();
         double stocksSoldPrice = stock.get().getPrice() * sharesToSell;
         int remainingShares = userShares - sharesToSell;
-        updateStockPositionShares(
+
+        Optional<StockOwnership> updatedStockPosition = updateStockPositionShares(
                 userStockPosition.get().id(),
                 new RequestStockOwnershipDTO(
                         remainingShares
                 )
         );
+
+        if (updatedStockPosition.isEmpty()) {
+            throw new IllegalStateException("Error on update shares in portfolio");
+        }
+
         if (remainingShares == 0) {
             removeStockPositionFromPortfolio(userStockPosition.get().id());
         }
         user.setBalance(userBalance + stocksSoldPrice);
-        return ResponseUserDTO.fromUser(userRepository.save(user));
+        userRepository.save(user);
+
+        return ResponseStockOwnershipDTO.fromStockPosition(updatedStockPosition.get());
     }
 }

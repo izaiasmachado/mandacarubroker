@@ -2,7 +2,6 @@ package com.mandacarubroker.controller;
 
 import com.mandacarubroker.domain.position.RequestStockOwnershipDTO;
 import com.mandacarubroker.domain.position.ResponseStockOwnershipDTO;
-import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.service.PortfolioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -30,18 +29,18 @@ public class PortfolioController {
     }
 
     @PostMapping("/{stockId}/buy")
-    public ResponseEntity<ResponseUserDTO> buyStock(
+    public ResponseEntity<ResponseStockOwnershipDTO> buyStock(
             @PathVariable final String stockId,
             @RequestBody @Valid final RequestStockOwnershipDTO shares) {
-        ResponseUserDTO user = portfolioService.buyStock(stockId, shares);
-        return ResponseEntity.ok(user);
+        ResponseStockOwnershipDTO stockPosition = portfolioService.buyStock(stockId, shares);
+        return ResponseEntity.ok(stockPosition);
     }
 
     @PostMapping("/{stockId}/sell")
-    public ResponseEntity<ResponseUserDTO> sellStock(
+    public ResponseEntity<ResponseStockOwnershipDTO> sellStock(
             @PathVariable final String stockId,
             @RequestBody @Valid final RequestStockOwnershipDTO shares) {
-        ResponseUserDTO user = portfolioService.sellStock(stockId, shares);
-        return ResponseEntity.ok(user);
+        ResponseStockOwnershipDTO stockPosition = portfolioService.sellStock(stockId, shares);
+        return ResponseEntity.ok(stockPosition);
     }
 }
