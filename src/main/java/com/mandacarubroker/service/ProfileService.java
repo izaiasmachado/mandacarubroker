@@ -10,8 +10,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static com.mandacarubroker.validation.RecordValidation.validateRequestDTO;
@@ -21,8 +19,8 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final PasswordHashingService passwordHashingService = new PasswordHashingService();
 
-    public ProfileService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public ProfileService(final UserRepository receivedUserRepository) {
+        this.userRepository = receivedUserRepository;
     }
 
     private ResponseProfileDTO profileToResponseUserDTO(final User user) {
