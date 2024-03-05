@@ -58,7 +58,7 @@ public class PortfolioService {
     }
 
 
-    public StockOwnership createStockPosition(
+    private StockOwnership createStockPosition(
             final RequestStockOwnershipDTO requestStockOwnershipDTO,
             final Stock stock,
             final User user) {
@@ -66,7 +66,7 @@ public class PortfolioService {
         return stockPositionRepository.save(newStockPosition);
     }
 
-    public Optional<StockOwnership> updateShares(
+    private Optional<StockOwnership> updateStockPositionShares(
             final String stockOwnershipId,
             final RequestStockOwnershipDTO requestStockOwnershipDTO
     ) {
@@ -78,7 +78,7 @@ public class PortfolioService {
     }
 
 
-    public ResponseStockOwnershipDTO addStockInPortfolio(
+    private ResponseStockOwnershipDTO addStockPositionInPortfolio(
             final Stock stock,
             final User user,
             final RequestStockOwnershipDTO shares
@@ -88,7 +88,7 @@ public class PortfolioService {
                 getStockPositionByUserIdAndStockId(stock.getId());
 
         if (existentStockPosition.isPresent()) {
-            Optional<StockOwnership> updatedStockPosition = updateShares(
+            Optional<StockOwnership> updatedStockPosition = updateStockPositionShares(
                     existentStockPosition.get().id(),
                     new RequestStockOwnershipDTO(
                             existentStockPosition.get().totalShares()
@@ -112,6 +112,10 @@ public class PortfolioService {
         );
     }
 
+    private void removeStockPositionFromPortfolio(final String stockPositionId) {
+        stockPositionRepository.deleteById(stockPositionId);
+    }
+
     public ResponseUserDTO buyStock(final String stockId, final RequestStockOwnershipDTO shares) {
         User user = AuthService.getAuthenticatedUser();
         Optional<Stock> stock = stockService.getStockById(stockId);
@@ -125,9 +129,38 @@ public class PortfolioService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Insufficient balance");
         }
 
-        addStockInPortfolio(stock.get(), user, shares);
+        addStockPositionInPortfolio(stock.get(), user, shares);
         user.setBalance(userBalance - stockBoughtPrice);
 
+        return ResponseUserDTO.fromUser(userRepository.save(user));
+    }
+
+    public ResponseUserDTO sellStock(final String stockId, final RequestStockOwnershipDTO shares) {
+        User user = AuthService.getAuthenticatedUser();
+        Optional<Stock> stock = stockService.getStockById(stockId);
+        Optional<ResponseStockOwnershipDTO> userStockPosition = getStockPositionByUserIdAndStockId(stockId);
+
+        if (userStockPosition.isEmpty() || stock.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Stock not found");
+        }
+        int sharesToSell = shares.shares();
+        int userShares = userStockPosition.get().totalShares();
+        if (sharesToSell > userShares) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User with insufficient shares to sell");
+        }
+        double userBalance = user.getBalance();
+        double stocksSoldPrice = stock.get().getPrice() * sharesToSell;
+        int remainingShares = userShares - sharesToSell;
+        updateStockPositionShares(
+                userStockPosition.get().id(),
+                new RequestStockOwnershipDTO(
+                        remainingShares
+                )
+        );
+        if (remainingShares == 0) {
+            removeStockPositionFromPortfolio(userStockPosition.get().id());
+        }
+        user.setBalance(userBalance + stocksSoldPrice);
         return ResponseUserDTO.fromUser(userRepository.save(user));
     }
 }

@@ -31,4 +31,12 @@ public class PortfolioController {
         ResponseUserDTO user = portfolioService.buyStock(stockId, shares);
         return ResponseEntity.ok(user);
     }
+
+    @PostMapping("/{stockId}/sell")
+    public ResponseEntity<ResponseUserDTO> sellStock(
+            @PathVariable final String stockId,
+            @RequestBody @Valid final RequestStockOwnershipDTO shares) {
+        ResponseUserDTO user = portfolioService.sellStock(stockId, shares);
+        return ResponseEntity.ok(user);
+    }
 }
