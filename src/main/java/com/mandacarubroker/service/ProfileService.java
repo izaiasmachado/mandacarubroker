@@ -5,6 +5,9 @@ import com.mandacarubroker.domain.profile.ResponseProfileDTO;
 import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -68,5 +71,16 @@ public class ProfileService {
                     user.setPassword(hashedPassword);
                     return profileToResponseUserDTO(userRepository.save(user));
                 });
+    }
+    public static User getAuthenticatedUser() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+        return (User) principal;
     }
 }

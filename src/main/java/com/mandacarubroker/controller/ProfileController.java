@@ -1,6 +1,8 @@
 package com.mandacarubroker.controller;
 import com.mandacarubroker.domain.profile.RequestProfileDTO;
 import com.mandacarubroker.domain.profile.ResponseProfileDTO;
+import com.mandacarubroker.domain.user.User;
+import com.mandacarubroker.service.AuthService;
 import com.mandacarubroker.service.ProfileService;
 import com.mandacarubroker.service.UserService;
 import jakarta.validation.Valid;
@@ -10,10 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Optional;
 
 import static com.puppycrawl.tools.checkstyle.grammar.javadoc.JavadocLexer.exception;
@@ -30,20 +30,17 @@ public class ProfileController {
         this.userService = userService;
     }
 
-    @PutMapping("/me")
-    public ResponseEntity<Object> updateUser(@RequestBody @Valid final RequestProfileDTO updatedUserDTO) {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication authentication = securityContext.getAuthentication();
-        Object principal = authentication.getPrincipal();
+    @PutMapping("/me/{userName}")
+    public ResponseEntity<Object> updateUser(@PathVariable final String userName, @RequestBody @Valid final RequestProfileDTO updatedUserDTO) {
+        User user = AuthService.getAuthenticatedUser();
 
-        if (principal instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) principal;
-            String userName = userDetails.getUsername();
-            Optional<ResponseProfileDTO> updatedProfile = profileService.updateProfile(userName, updatedUserDTO);
-            return ResponseEntity.ok(updatedProfile.get());
+        Optional<ResponseProfileDTO> updatedProfile = profileService.updateProfile(userName, updatedUserDTO);
+
+        if (updatedProfile.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(updatedProfile.get());
     }
 
 }

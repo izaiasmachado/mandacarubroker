@@ -11,5 +11,16 @@ public record ResponseUserDTO(
         LocalDate birthDate,
         double balance
 ) {
+    public static ResponseUserDTO fromUser(final User user) {
+        return new ResponseUserDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBirthDate(),
+                user.getBalance()
+        );
+    }
 }
 
