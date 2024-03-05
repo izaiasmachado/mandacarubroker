@@ -8,7 +8,9 @@ import com.mandacarubroker.domain.stock.Stock;
 import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -115,12 +117,12 @@ public class PortfolioService {
         Optional<Stock> stock = stockService.getStockById(stockId);
 
         if (stock.isEmpty()) {
-            throw new IllegalStateException("Stock nonexistent");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Stock not found");
         }
         double userBalance = user.getBalance();
         double stockBoughtPrice = stock.get().getPrice() * shares.shares();
         if (userBalance < stockBoughtPrice) {
-            throw new IllegalStateException("Insufficient balance");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Insufficient balance");
         }
 
         addStockInPortfolio(stock.get(), user, shares);
