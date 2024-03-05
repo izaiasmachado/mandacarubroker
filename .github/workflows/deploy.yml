@@ -6,7 +6,6 @@ on:
 
 jobs:
   deploy:
-    needs: push-to-registry
     name: Deploy to Azure VM
     runs-on: ubuntu-latest
     environment:
