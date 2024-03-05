@@ -8,6 +8,7 @@ import com.mandacarubroker.domain.stock.RequestStockDTO;
 import com.mandacarubroker.domain.stock.Stock;
 import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.User;
+import com.mandacarubroker.domain.user.UserRepository;
 import com.mandacarubroker.security.SecuritySecretsMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,8 @@ import static org.mockito.Mockito.mockStatic;
 public class PortfolioServiceTest {
     @MockBean
     private StockOwnershipRepository stockPositionRepository;
+    private StockService stockService;
+    private UserRepository userRepository;
 
     private PortfolioService portfolioService;
 
@@ -60,7 +63,14 @@ public class PortfolioServiceTest {
         stockPositionRepository = Mockito.mock(StockOwnershipRepository.class);
         Mockito.when(stockPositionRepository.findByUserId(validUser.getId())).thenReturn(givenStockOwnerships);
 
-        portfolioService = new PortfolioService(stockPositionRepository);
+        stockService = Mockito.mock(StockService.class);
+        userRepository = Mockito.mock(UserRepository.class);
+
+        portfolioService = new PortfolioService(
+                stockPositionRepository,
+                stockService,
+                userRepository
+                );
     }
 
     @Test
