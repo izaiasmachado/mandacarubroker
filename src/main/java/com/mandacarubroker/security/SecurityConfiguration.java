@@ -11,7 +11,14 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.mandacarubroker.domain.user.Permission.*;
+import static com.mandacarubroker.domain.user.Permission.STOCKS_UPDATE;
+import static com.mandacarubroker.domain.user.Permission.STOCKS_CREATE;
+import static com.mandacarubroker.domain.user.Permission.STOCKS_READ;
+import static com.mandacarubroker.domain.user.Permission.STOCKS_DELETE;
+import static com.mandacarubroker.domain.user.Permission.USER_CREATE;
+import static com.mandacarubroker.domain.user.Permission.USER_READ;
+import static com.mandacarubroker.domain.user.Permission.USER_UPDATE;
+import static com.mandacarubroker.domain.user.Permission.USER_DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
