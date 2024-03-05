@@ -5,27 +5,27 @@ on:
     #   - main
 
 jobs:
-  push-to-registry:
-    name: Push to DockerHub Registry
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+  # push-to-registry:
+  #   name: Push to DockerHub Registry
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: "zulu"
+  #     - name: Set up JDK 17
+  #       uses: actions/setup-java@v3
+  #       with:
+  #         java-version: 17
+  #         distribution: "zulu"
 
-      - name: Login to DockerHub
-        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+  #     - name: Login to DockerHub
+  #       run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api
+  #     - name: Build and push Docker image
+  #       run: |
+  #         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api .
+  #         docker push ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api
 
   deploy:
     needs: push-to-registry
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: azure-production
-      url: ${{ env.AZURE_VM_IP }}
+      url: ${{ vars.AZURE_VM_IP }}
     steps:
       - name: Set up Azure CLI
         uses: azure/login@v1
@@ -47,20 +47,20 @@ jobs:
 
       - name: Echo environment variables
         run: |
-          echo ${{ env.AZURE_VM_IP }}
-          echo ${{ env.AZURE_VM_USER }}
-          echo ${{ env.MANDACARU_SQL_INIT_MODE }}
-          echo ${{ env.MANDACARU_API_PORT }}
+          echo ${{ vars.AZURE_VM_IP }}
+          echo ${{ vars.AZURE_VM_USER }}
+          echo ${{ vars.MANDACARU_SQL_INIT_MODE }}
+          echo ${{ vars.MANDACARU_API_PORT }}
 
       - name: Deploy to Azure VM
         run:
-          ssh -o StrictHostKeyChecking=no -i private_key ${{ env.AZURE_VM_USER }}@${{ env.AZURE_VM_IP }} 'sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api || true && sudo docker stop mandacarubroker-api || true && docker rm mandacarubroker-api || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name mandacarubroker-api \
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ vars.AZURE_VM_USER }}@${{ vars.AZURE_VM_IP }} 'sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api || true && sudo docker stop mandacarubroker-api || true && docker rm mandacarubroker-api || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name mandacarubroker-api \
           -e MANDACARU_POSTGRES_HOST=${{ secrets.MANDACARU_POSTGRES_HOST }} \
           -e MANDACARU_POSTGRES_PORT=${{ secrets.MANDACARU_POSTGRES_PORT }} \
           -e MANDACARU_POSTGRES_DB=${{ secrets.MANDACARU_POSTGRES_DB }} \
           -e MANDACARU_POSTGRES_USER=${{ secrets.MANDACARU_POSTGRES_USER }} \
           -e MANDACARU_POSTGRES_PASSWORD=${{ secrets.MANDACARU_POSTGRES_PASSWORD }} \
-          -e MANDACARU_SQL_INIT_MODE=${{ env.MANDACARU_SQL_INIT_MODE }} \
+          -e MANDACARU_SQL_INIT_MODE=${{ vars.MANDACARU_SQL_INIT_MODE }} \
           -e MANDACARU_JWT_SECRET=${{ secrets.MANDACARU_JWT_SECRET }} \
-          -e MANDACARU_API_PORT=${{ env.MANDACARU_API_PORT }} \
-          -p ${{ env.MANDACARU_API_PORT }}:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api'
+          -e MANDACARU_API_PORT=${{ vars.MANDACARU_API_PORT }} \
+          -p ${{ vars.MANDACARU_API_PORT }}:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api'
