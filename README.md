@@ -94,10 +94,12 @@ DELETE /stocks/{id}
 
 ## Tecnologias Utilizadas
 
-- Maven
 - Spring Boot
 - JUnit5
 - PostgreSQL
+- Bcrypt
+- Json Web Token
+- Swagger OpenAPI
 
 ## Contribuições
 
