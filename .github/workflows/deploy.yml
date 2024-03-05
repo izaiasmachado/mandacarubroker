@@ -43,6 +43,8 @@ jobs:
       - name: Connect to Azure VM and run Docker
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          echo ${{ env.AZURE_VM_IP }}
+          echo ${{ env.AZURE_VM_USER }}
           chmod 400 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${{ env.AZURE_VM_USER }}@${{ env.AZURE_VM_IP }} 'sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api || true && sudo docker stop mandacarubroker-api || true && docker rm mandacarubroker-api || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name mandacarubroker-api \
             -e MANDACARU_POSTGRES_HOST=${{ secrets.MANDACARU_POSTGRES_HOST }} \
