@@ -6,6 +6,7 @@ import com.mandacarubroker.domain.position.StockOwnership;
 import com.mandacarubroker.domain.position.StockOwnershipRepository;
 import com.mandacarubroker.domain.stock.RequestStockDTO;
 import com.mandacarubroker.domain.stock.Stock;
+import com.mandacarubroker.domain.stock.StockRepository;
 import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.security.SecuritySecretsMock;
@@ -24,6 +25,9 @@ import static org.mockito.Mockito.mockStatic;
 public class PortfolioServiceTest {
     @MockBean
     private StockOwnershipRepository stockPositionRepository;
+
+    @MockBean
+    private StockRepository stockRepository;
 
     private PortfolioService portfolioService;
 
@@ -44,8 +48,8 @@ public class PortfolioServiceTest {
     private final Stock appleStock = new Stock(requestAppleStock);
     private final Stock googleStock = new Stock(requestGoogleStock);
     private final List<ResponseStockOwnershipDTO> storedStockPortfolio = List.of(
-            new ResponseStockOwnershipDTO("apple-stock-id", appleStock, 100, 10000.00),
-            new ResponseStockOwnershipDTO("google-stock-id", googleStock, 200, 400000.00)
+            new ResponseStockOwnershipDTO(appleStock, 100, 10000.00),
+            new ResponseStockOwnershipDTO(googleStock, 200, 400000.00)
     );
 
     private final List<StockOwnership> givenStockOwnerships = List.of(
@@ -58,9 +62,10 @@ public class PortfolioServiceTest {
         SecuritySecretsMock.mockStatic();
 
         stockPositionRepository = Mockito.mock(StockOwnershipRepository.class);
+        stockRepository = Mockito.mock(StockRepository.class);
         Mockito.when(stockPositionRepository.findByUserId(validUser.getId())).thenReturn(givenStockOwnerships);
 
-        portfolioService = new PortfolioService(stockPositionRepository);
+        portfolioService = new PortfolioService(stockPositionRepository, stockRepository);
     }
 
     @Test

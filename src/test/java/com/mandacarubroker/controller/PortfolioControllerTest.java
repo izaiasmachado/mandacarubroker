@@ -23,8 +23,8 @@ public class PortfolioControllerTest {
     private final Stock appleStock = new Stock(requestAppleStock);
     private final Stock googleStock = new Stock(requestGoogleStock);
     private final List<ResponseStockOwnershipDTO> storedStockPortfolio = List.of(
-            new ResponseStockOwnershipDTO("apple-stock-id", appleStock, 100, 10000.00),
-            new ResponseStockOwnershipDTO("google-stock-id", googleStock, 200, 400000.00)
+            new ResponseStockOwnershipDTO(appleStock, 100, 10000.00),
+            new ResponseStockOwnershipDTO(googleStock, 200, 400000.00)
     );
 
     @BeforeEach
@@ -49,7 +49,6 @@ public class PortfolioControllerTest {
             Stock expectedStock = expectedStockOwnership.stock();
             Stock actualStock = actualStockOwnership.stock();
 
-            assertEquals(expectedStockOwnership.id(), actualStockOwnership.id());
             assertEquals(expectedStockOwnership.totalShares(), actualStockOwnership.totalShares());
             assertEquals(expectedStockOwnership.positionValue(), actualStockOwnership.positionValue());
             assertStocksAreEqual(expectedStock, actualStock);
