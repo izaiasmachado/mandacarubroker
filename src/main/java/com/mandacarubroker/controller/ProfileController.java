@@ -26,10 +26,10 @@ public class ProfileController {
         this.userService = receivedUserService;
     }
 
-    @PutMapping("/me/{userName}")
-    public ResponseEntity<Object> updateUser(@PathVariable final String userName, @RequestBody @Valid final RequestProfileDTO updatedUserDTO) {
+    @PutMapping("/me")
+    public ResponseEntity<Object> updateUser(@RequestBody @Valid final RequestProfileDTO updatedUserDTO) {
         User user = AuthService.getAuthenticatedUser();
-
+        String userName = user.getUsername();
         Optional<ResponseProfileDTO> updatedProfile = profileService.updateProfile(userName, updatedUserDTO);
 
         if (updatedProfile.isEmpty()) {
