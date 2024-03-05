@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface StockOwnershipRepository extends JpaRepository<StockOwnership, String> {
     List<StockOwnership> findByUserId(String userId);
+    StockOwnership findByUserIdAndStockId(String userId, String stockId);
 }

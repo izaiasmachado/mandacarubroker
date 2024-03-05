@@ -3,7 +3,6 @@ package com.mandacarubroker.domain.position;
 import com.mandacarubroker.domain.stock.Stock;
 
 public record ResponseStockOwnershipDTO(
-    String id,
     Stock stock,
     int totalShares,
     double positionValue
@@ -12,10 +11,17 @@ public record ResponseStockOwnershipDTO(
         final Stock stock = stockPosition.getStock();
 
         return new ResponseStockOwnershipDTO(
-            stockPosition.getId(),
             stock,
             stockPosition.getShares(),
             stockPosition.getTotalValue()
+        );
+    }
+
+    public static ResponseStockOwnershipDTO fromStock(final Stock stock) {
+        return new ResponseStockOwnershipDTO(
+            stock,
+            0,
+            0
         );
     }
 }
