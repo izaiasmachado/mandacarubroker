@@ -103,6 +103,11 @@ DELETE /stocks/{id}
 
 Contribuições são bem-vindas!
 
+## Equipe
+
+| [<img src="https://avatars.githubusercontent.com/u/69826078?v=3&s=115"><br><sub>@iriscoxta</sub>](https://github.com/iriscoxta) | [<img src="https://avatars0.githubusercontent.com/u/47287096?v=3&s=115"><br><sub>@izaiasmachado</sub>](https://github.com/izaiasmachado) | [<img src="https://avatars0.githubusercontent.com/u/43821439?v=3&s=115"><br><sub>@JonasFortes12</sub>](https://github.com/JonasFortes12) | [<img src="https://avatars0.githubusercontent.com/u/70725719?v=3&s=115"><br><sub>@williambrunos</sub>](https://github.com/williambrunos) | [<img src="https://avatars0.githubusercontent.com/u/112739407?v=3&s=115"><br><sub>@yannluk4</sub>](https://github.com/yannluk4) |
+| :-----------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------: |
+
 ## Licença
 
 Este projeto está licenciado sob a [Licença MIT](LICENSE).
