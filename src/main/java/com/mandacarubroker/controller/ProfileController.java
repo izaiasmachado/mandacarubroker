@@ -6,18 +6,14 @@ import com.mandacarubroker.service.AuthService;
 import com.mandacarubroker.service.ProfileService;
 import com.mandacarubroker.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Optional;
-
-import static com.puppycrawl.tools.checkstyle.grammar.javadoc.JavadocLexer.exception;
-import static net.sf.saxon.om.EnumSetTool.except;
 
 @RestController
 @RequestMapping("/profile")
@@ -25,9 +21,9 @@ public class ProfileController {
     private final ProfileService profileService;
     private final UserService userService;
 
-    public ProfileController(final ProfileService profileService, UserService userService) {
-        this.profileService = profileService;
-        this.userService = userService;
+    public ProfileController(final ProfileService receivedProfileService, final UserService receivedUserService) {
+        this.profileService = receivedProfileService;
+        this.userService = receivedUserService;
     }
 
     @PutMapping("/me/{userName}")
