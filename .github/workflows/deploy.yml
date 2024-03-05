@@ -1,8 +1,8 @@
 name: Deploy
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
 
 jobs:
   push-to-registry:
@@ -31,14 +31,26 @@ jobs:
     needs: push-to-registry
     name: Deploy to Azure VM
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ env.AZURE_VM_IP }}
     steps:
       - name: Set up Azure CLI
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Connect to Azure VM and run Docker Compose
+      - name: Connect to Azure VM and run Docker
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 400 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key william@172.176.145.143 'sudo docker pull izaiasmachado/mandacarubroker-api || true && sudo docker stop mandacarubroker-api || true && docker rm mandacarubroker-api || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name mandacarubroker-api --env-file=/home/william/mandacaru-broker-jandaia/.env -p 8080:8080 -d izaiasmachado/mandacarubroker-api'
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ env.AZURE_VM_USER }}@${{ env.AZURE_VM_IP }} 'sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api || true && sudo docker stop mandacarubroker-api || true && docker rm mandacarubroker-api || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name mandacarubroker-api \
+            -e MANDACARU_POSTGRES_HOST=${{ secrets.MANDACARU_POSTGRES_HOST }} \
+            -e MANDACARU_POSTGRES_PORT=${{ secrets.MANDACARU_POSTGRES_PORT }} \
+            -e MANDACARU_POSTGRES_DB=${{ secrets.MANDACARU_POSTGRES_DB }} \
+            -e MANDACARU_POSTGRES_USER=${{ secrets.MANDACARU_POSTGRES_USER }} \
+            -e MANDACARU_POSTGRES_PASSWORD=${{ secrets.MANDACARU_POSTGRES_PASSWORD }} \
+            -e MANDACARU_SQL_INIT_MODE=${{ env.MANDACARU_SQL_INIT_MODE }} \
+            -e MANDACARU_JWT_SECRET=${{ secrets.MANDACARU_JWT_SECRET }} \
+            -e MANDACARU_API_PORT=${{ env.MANDACARU_API_PORT }} \
+            -p ${{ env.MANDACARU_API_PORT }}:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api'
