@@ -27,7 +27,7 @@ public class AccountController {
 
     @Operation(summary = "Retorna saldo atualizado", description = "Retorna um usuário com o saldo atualizado após o depósito")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Saldo autalizado após o depósito"),
+            @ApiResponse(responseCode = "200", description = "Saldo atualizado após o depósito"),
             @ApiResponse(responseCode = "400", description = "Erro nas verificações de saldo")
     })
     @GetMapping("/deposit")
@@ -43,7 +43,7 @@ public class AccountController {
 
     @Operation(summary = "Retorna saldo atualizado", description = "Retorna um usuário com o saldo atualizado após o saque")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Saldo autalizado após o saque"),
+            @ApiResponse(responseCode = "200", description = "Saldo atualizado após o saque"),
             @ApiResponse(responseCode = "400", description = "Erro nas verificações de saldo")
     })
     @GetMapping("/withdraw")
