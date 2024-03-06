@@ -1,5 +1,6 @@
 package com.mandacarubroker.domain.user;
 
+import com.mandacarubroker.domain.auth.RequestUserRegisterDTO;
 import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -44,6 +45,16 @@ public class User implements UserDetails {
         this.lastName = requestUserDTO.lastName();
         this.birthDate = requestUserDTO.birthDate();
         this.balance = requestUserDTO.balance();
+    }
+
+    public User(final RequestUserRegisterDTO requestUserRegisterDTO) {
+        this.email = requestUserRegisterDTO.email();
+        this.username = requestUserRegisterDTO.username();
+        this.password = requestUserRegisterDTO.password();
+        this.firstName = requestUserRegisterDTO.firstName();
+        this.lastName = requestUserRegisterDTO.lastName();
+        this.birthDate = requestUserRegisterDTO.birthDate();
+        this.balance = 0;
     }
 
     public void deposit(final double amount) {

@@ -1,9 +1,9 @@
 package com.mandacarubroker.controller;
 
 import com.mandacarubroker.domain.auth.RequestAuthUserDTO;
+import com.mandacarubroker.domain.auth.RequestUserRegisterDTO;
 import com.mandacarubroker.domain.auth.ResponseAuthUserDTO;
 import com.mandacarubroker.domain.user.ResponseUserDTO;
-import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.service.AuthService;
 import com.mandacarubroker.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
 import java.util.Optional;
 
 @Tag(name = "Autenticação", description = "Operações relacionadas a autenticação do usuário")
@@ -48,10 +47,20 @@ public class AuthController {
         return ResponseEntity.ok(responseAuthUserDTO.orElseThrow());
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<ResponseUserDTO> getCurrentUser() {
-        User user = AuthService.getAuthenticatedUser();
-        ResponseUserDTO responseUserDTO = ResponseUserDTO.fromUser(user);
-        return ResponseEntity.ok(responseUserDTO);
+    @Operation(summary = "Cria um usuário", description = "Cria um novo usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário criado"),
+            @ApiResponse(responseCode = "409", description = "Nome de usuário (username) já usado")
+    })
+    @PostMapping("/register")
+    public ResponseEntity<ResponseUserDTO> register(@Valid @RequestBody final RequestUserRegisterDTO requestAuthUserDTO) {
+        Optional<ResponseUserDTO> responseAuthUserDTO = authService.register(requestAuthUserDTO);
+
+        if (responseAuthUserDTO.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        ResponseUserDTO responseUserDTO = responseAuthUserDTO.orElseThrow();
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseUserDTO);
     }
 }

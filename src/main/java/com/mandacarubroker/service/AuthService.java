@@ -1,7 +1,9 @@
 package com.mandacarubroker.service;
 
 import com.mandacarubroker.domain.auth.RequestAuthUserDTO;
+import com.mandacarubroker.domain.auth.RequestUserRegisterDTO;
 import com.mandacarubroker.domain.auth.ResponseAuthUserDTO;
+import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,7 @@ public class AuthService {
 
     private final PasswordHashingService passwordHashingService;
     private final TokenService tokenService;
+
 
     public AuthService(final UserRepository receivedUserRepostory, final PasswordHashingService receivedPasswordHashingService, final TokenService receivedTokenService) {
         this.userRepository = receivedUserRepostory;
@@ -68,5 +71,26 @@ public class AuthService {
 
         Object principal = authentication.getPrincipal();
         return (User) principal;
+    }
+
+    private User hashPassword(final User user) {
+        final String rawPassword = user.getPassword();
+        final String hashedPassword = passwordHashingService.encode(rawPassword);
+        user.setPassword(hashedPassword);
+        return user;
+    }
+
+    public Optional<ResponseUserDTO> register(final RequestUserRegisterDTO requestUserRegisterDTO) {
+        validateRequestDTO(requestUserRegisterDTO);
+        User userExists = userRepository.findByUsername(requestUserRegisterDTO.username());
+        if (userExists != null) {
+            return Optional.empty();
+        }
+
+        User newUser = new User(requestUserRegisterDTO);
+        User hashedPasswordUser = hashPassword(newUser);
+        User savedUser = userRepository.save(hashedPasswordUser);
+
+        return Optional.of(ResponseUserDTO.fromUser(savedUser));
     }
 }

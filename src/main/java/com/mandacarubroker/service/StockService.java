@@ -1,6 +1,7 @@
 package com.mandacarubroker.service;
 
 import com.mandacarubroker.domain.stock.RequestStockDTO;
+import com.mandacarubroker.domain.stock.ResponseStockDTO;
 import com.mandacarubroker.domain.stock.Stock;
 import com.mandacarubroker.domain.stock.StockRepository;
 
@@ -19,29 +20,49 @@ public final class StockService {
         this.stockRepository = recievedStockRepository;
     }
 
-    public List<Stock> getAllStocks() {
-        return stockRepository.findAll();
+    public List<ResponseStockDTO> getAllStocks() {
+        List<Stock> stocks = stockRepository.findAll();
+        return stocks.stream()
+                .map(ResponseStockDTO::fromStock)
+                .toList();
     }
 
-    public Optional<Stock> getStockById(final String stockId) {
-        return stockRepository.findById(stockId);
+    public Optional<ResponseStockDTO> getStockById(final String stockId) {
+        Optional<Stock> stock = stockRepository.findById(stockId);
+
+        if (stock.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ResponseStockDTO responseStockDTO = ResponseStockDTO.fromStock(stock.get());
+        return Optional.of(responseStockDTO);
     }
 
-    public Stock createStock(final RequestStockDTO requestStockDTO) {
+    public Optional<ResponseStockDTO> createStock(final RequestStockDTO requestStockDTO) {
         validateRequestDTO(requestStockDTO);
         Stock newStock = new Stock(requestStockDTO);
-        return stockRepository.save(newStock);
+        Stock savedStock = stockRepository.save(newStock);
+        ResponseStockDTO responseStockDTO = ResponseStockDTO.fromStock(savedStock);
+        return Optional.of(responseStockDTO);
     }
 
-    public Optional<Stock> updateStock(final String stockId, final RequestStockDTO requestStockDTO) {
+    public Optional<ResponseStockDTO> updateStock(final String stockId, final RequestStockDTO requestStockDTO) {
         validateRequestDTO(requestStockDTO);
-        return stockRepository.findById(stockId)
-                .map(stock -> {
-                    stock.setSymbol(requestStockDTO.symbol());
-                    stock.setCompanyName(requestStockDTO.companyName());
-                    stock.setPrice(requestStockDTO.price());
-                    return stockRepository.save(stock);
-                });
+
+        Optional<Stock> foundStock = stockRepository.findById(stockId);
+
+        if (foundStock.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Stock stock = foundStock.get();
+        stock.setSymbol(requestStockDTO.symbol());
+        stock.setCompanyName(requestStockDTO.companyName());
+        stock.setPrice(requestStockDTO.price());
+
+        Stock updatedStock = stockRepository.save(stock);
+        ResponseStockDTO responseStockDTO = ResponseStockDTO.fromStock(updatedStock);
+        return Optional.of(responseStockDTO);
     }
 
     public void deleteStock(final String id) {

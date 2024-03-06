@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mandacarubroker.domain.stock.RequestStockDTO;
+import com.mandacarubroker.domain.stock.ResponseStockDTO;
 import com.mandacarubroker.domain.stock.Stock;
 import com.mandacarubroker.service.StockService;
 import org.junit.jupiter.api.AfterEach;
@@ -45,15 +46,17 @@ class StockControllerIT {
     private final RequestStockDTO validStockDTO = new RequestStockDTO(validSymbol, validCompanyName, validPrice);
     private final RequestStockDTO invalidSymbolStockDTO = new RequestStockDTO("MDDAAA2", validCompanyName, validPrice);
     private final String invalidPriceStockJsonString = "{\"symbol\":\"MDDC2\",\"companyName\":\"Mandacaru Inc.\",\"price\":\"40A\"}";
+    private final String stockChangedId = "{\"id\":\"new-id\",\"symbol\":\"MDDC2\",\"companyName\":\"Mandacaru Inc.\",\"price\":\"1.00\"}";
 
-    private Stock stock;
+    private ResponseStockDTO stock;
     private String stockId;
     private String urlRequestStockById;
 
     @BeforeEach
     void setUp() {
-        stock = service.getAllStocks().get(0);
-        stockId = stock.getId();
+        List<ResponseStockDTO> stocks = service.getAllStocks();
+        stock = stocks.get(0);
+        stockId = stock.id();
         urlRequestStockById = "/stocks/" + stockId;
     }
 
@@ -222,18 +225,16 @@ class StockControllerIT {
 
     @Test
     void itShouldNotBeAbleToPutStockId() throws Exception {
-        stock.setId("novo-id");
-        String stockJsonString = objectMapper.writeValueAsString(stock);
-
         RequestBuilder requestBuilder = put(urlRequestStockById)
                 .contentType("application/json")
-                .content(stockJsonString);
+                .content(stockChangedId);
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         String content = result.getResponse().getContentAsString();
-        Stock createdStock = objectMapper.readValue(content, Stock.class);
+        System.out.println(content);
+        ResponseStockDTO createdStock = objectMapper.readValue(content, ResponseStockDTO.class);
 
-        assertEquals(stockId, createdStock.getId());
+        assertEquals(stockId, createdStock.id());
     }
 
     @Test
