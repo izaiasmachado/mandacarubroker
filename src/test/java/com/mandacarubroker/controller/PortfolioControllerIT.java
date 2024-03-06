@@ -56,6 +56,7 @@ public class PortfolioControllerIT {
     private ResponseStockDTO stockToOperate;
     private final RequestStockOwnershipDTO shares = new RequestStockOwnershipDTO(2);
     private String urlRequestToBuyStock;
+    private String notFoundStockUrlRequestToBuyStock;
     private String urlRequestToSellStock;
 
     private RequestAuthUserDTO validRequestAuthUserDTO;
@@ -69,7 +70,7 @@ public class PortfolioControllerIT {
         stockToOperate = stockService.getAllStocks().get(0);
 
         urlRequestToBuyStock = "/portfolio/stock/" + stockToOperate.id() + "/buy";
-        urlRequestToSellStock = "/portfolio/stock/" + stockToOperate.id() + "/buy";
+        urlRequestToSellStock = "/portfolio/stock/" + stockToOperate.id() + "/sell";
     }
 
     @AfterEach
@@ -83,9 +84,7 @@ public class PortfolioControllerIT {
 
         Optional<ResponseAuthUserDTO> user = authService.login(validRequestAuthUserDTO);
         String token = user.get().token();
-
         String sharesJsonString = objectMapper.writeValueAsString(shares);
-
 
         RequestBuilder requestBuilder = post(urlRequestToBuyStock)
                 .contentType("application/json")
@@ -94,9 +93,22 @@ public class PortfolioControllerIT {
         ResultMatcher matchStatus = status().isOk();
 
         mockMvc.perform(requestBuilder).andExpect(matchStatus);
-
     }
 
+    @Test
+    void itShouldReturnOkStatusAfterSucessfulSellStock() throws Exception{
 
+        Optional<ResponseAuthUserDTO> user = authService.login(validRequestAuthUserDTO);
+        String token = user.get().token();
+        String sharesJsonString = objectMapper.writeValueAsString(shares);
+
+        RequestBuilder requestBuilder = post(urlRequestToSellStock)
+                .contentType("application/json")
+                .header("Authorization", token)
+                .content(sharesJsonString);
+        ResultMatcher matchStatus = status().isOk();
+
+        mockMvc.perform(requestBuilder).andExpect(matchStatus);
+    }
 
 }
