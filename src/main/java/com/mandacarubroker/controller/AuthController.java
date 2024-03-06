@@ -5,7 +5,6 @@ import com.mandacarubroker.domain.auth.RequestUserRegisterDTO;
 import com.mandacarubroker.domain.auth.ResponseAuthUserDTO;
 import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.service.AuthService;
-import com.mandacarubroker.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -24,11 +23,9 @@ import java.util.Optional;
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthService authService;
-    private final UserService userService;
 
-    public AuthController(final AuthService receivedAuthService, final UserService receivedUserService) {
+    public AuthController(final AuthService receivedAuthService) {
         this.authService = receivedAuthService;
-        this.userService = receivedUserService;
     }
 
     @Operation(summary = "Login do usuário", description = "Realiza o login do usuário e retorna o token de autenticação")
