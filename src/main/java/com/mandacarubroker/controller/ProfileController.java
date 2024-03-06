@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Optional;
 
-@Tag(name = "Perfil do Usuário", description = "Operações relacionadas ao perfil do usuário")
+@Tag(name = "Perfil do Usuário", description = "Operações relacionadas ao perfil do usuário. User role: user")
 @RestController
 @RequestMapping("/profile")
 public class ProfileController {
@@ -31,7 +31,7 @@ public class ProfileController {
         this.userService = receivedUserService;
     }
 
-    @Operation(summary = "Mostra dados de um usuário", description = "Mostra dados de um usuário autenticado")
+    @Operation(summary = "Retorna dados de um usuário", description = "Mostra dados de um usuário autenticado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Perfil de usuário encontrado")
     })

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.Optional;
 
-@Tag(name = "Ação", description = "Operações de CRUD das ações")
+@Tag(name = "Ação", description = "Operações referentes a Ações de Empresas listadas no Mandacaru Broker. User role: admin")
 @RestController
 @RequestMapping("/stocks")
 public class StockController {
@@ -44,9 +44,9 @@ public class StockController {
         @ApiResponse(responseCode = "200", description = "Ação encontrada"),
         @ApiResponse(responseCode = "404", description = "Ação não encontrada")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseStockDTO> getStockById(@PathVariable final String id) {
-        Optional<ResponseStockDTO> stock = stockService.getStockById(id);
+    @GetMapping("/{stockId}")
+    public ResponseEntity<ResponseStockDTO> getStockById(@PathVariable final String stockId) {
+        Optional<ResponseStockDTO> stock = stockService.getStockById(stockId);
 
         if (stock.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -77,9 +77,9 @@ public class StockController {
         @ApiResponse(responseCode = "404", description = "Ação não encontrada"),
         @ApiResponse(responseCode = "400", description = "Dados da ação são inválidos")
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseStockDTO> updateStock(@PathVariable final String id, @Valid @RequestBody final RequestStockDTO updatedStockDTO) {
-        Optional<ResponseStockDTO> updatedStock = stockService.updateStock(id, updatedStockDTO);
+    @PutMapping("/{stockId}")
+    public ResponseEntity<ResponseStockDTO> updateStock(@PathVariable final String stockId, @Valid @RequestBody final RequestStockDTO updatedStockDTO) {
+        Optional<ResponseStockDTO> updatedStock = stockService.updateStock(stockId, updatedStockDTO);
 
         if (updatedStock.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -89,9 +89,9 @@ public class StockController {
     }
 
     @Operation(summary = "Deleta uma ação", description = "Deleta uma ação cadastrada com base no id")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteStock(@PathVariable final String id) {
-        stockService.deleteStock(id);
+    @DeleteMapping("/{stockId}")
+    public ResponseEntity<Object> deleteStock(@PathVariable final String stockId) {
+        stockService.deleteStock(stockId);
         return ResponseEntity.noContent().build();
     }
 }

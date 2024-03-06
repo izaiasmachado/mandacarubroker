@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 import java.util.Optional;
 
-@Tag(name = "Usuário", description = "Operações de CRUD do usuário")
+@Tag(name = "Usuário", description = "Operações de CRUD do usuário. User role: admin")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -44,9 +44,9 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
         @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseUserDTO> getUserById(@PathVariable final String id) {
-        Optional<ResponseUserDTO> user = userService.getUserById(id);
+    @GetMapping("/{userId}")
+    public ResponseEntity<ResponseUserDTO> getUserById(@PathVariable final String userId) {
+        Optional<ResponseUserDTO> user = userService.getUserById(userId);
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -73,9 +73,9 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = "Dados do usuário são inválidos"),
         @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseUserDTO> updateUser(@PathVariable final String id, @RequestBody @Valid final RequestUserDTO updatedUserDTO) {
-        Optional<ResponseUserDTO> updatedUser = userService.updateUser(id, updatedUserDTO);
+    @PutMapping("/{userId}")
+    public ResponseEntity<ResponseUserDTO> updateUser(@PathVariable final String userId, @RequestBody @Valid final RequestUserDTO updatedUserDTO) {
+        Optional<ResponseUserDTO> updatedUser = userService.updateUser(userId, updatedUserDTO);
 
         if (updatedUser.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -85,9 +85,9 @@ public class UserController {
     }
 
     @Operation(summary = "Deleta um usuário", description = "Deleta um usuário cadastrado com base no id")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteUser(@PathVariable final String id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Object> deleteUser(@PathVariable final String userId) {
+        userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 }
