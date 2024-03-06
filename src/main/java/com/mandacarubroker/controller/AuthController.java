@@ -56,6 +56,11 @@ public class AuthController {
         return ResponseEntity.ok(responseUserDTO);
     }
 
+    @Operation(summary = "Cria um usuário", description = "Cria um novo usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário criado"),
+            @ApiResponse(responseCode = "409", description = "Nome de usuário (username) já usado")
+    })
     @PostMapping("/register")
     public ResponseEntity<ResponseUserDTO> register(@Valid @RequestBody final RequestUserRegisterDTO requestAuthUserDTO) {
         Optional<ResponseUserDTO> responseAuthUserDTO = authService.register(requestAuthUserDTO);
