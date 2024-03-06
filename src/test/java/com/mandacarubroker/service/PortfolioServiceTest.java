@@ -5,6 +5,7 @@ import com.mandacarubroker.domain.position.ResponseStockOwnershipDTO;
 import com.mandacarubroker.domain.position.StockOwnership;
 import com.mandacarubroker.domain.position.StockOwnershipRepository;
 import com.mandacarubroker.domain.stock.RequestStockDTO;
+import com.mandacarubroker.domain.stock.ResponseStockDTO;
 import com.mandacarubroker.domain.stock.Stock;
 import com.mandacarubroker.domain.stock.StockRepository;
 import com.mandacarubroker.domain.user.RequestUserDTO;
@@ -18,7 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.mandacarubroker.domain.stock.StockUtils.assertStocksAreEqual;
+import static com.mandacarubroker.domain.stock.StockUtils.assertResponseStockDTOEqualsStock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mockStatic;
 
@@ -38,28 +39,32 @@ public class PortfolioServiceTest {
             "Marcos",
             "Loiola",
             LocalDate.of(2002, 2, 26),
-            0.25
-    );
+            0.25);
 
     private final User validUser = new User(validRequestUserDTO);
 
-    private final RequestStockDTO requestAppleStock = new RequestStockDTO("AAPL", "Apple Inc", 100.00);
-    private final RequestStockDTO requestGoogleStock = new RequestStockDTO("GOOGL", "Alphabet Inc", 2000.00);
-    private final Stock appleStock = new Stock(requestAppleStock);
-    private final Stock googleStock = new Stock(requestGoogleStock);
+    private final RequestStockDTO requestAppleStockDTO = new RequestStockDTO("AAPL", "Apple Inc", 100.00);
+    private final RequestStockDTO requestGoogleStockDTO = new RequestStockDTO("GOOGL", "Alphabet Inc", 2000.00);
+    private final ResponseStockDTO responseAppleStockDTO = new ResponseStockDTO("apple-id", "AAPL", "Apple Inc",
+            100.00);
+    private final ResponseStockDTO responseGoogleStockDTO = new ResponseStockDTO("google-id", "GOOGL", "Alphabet Inc",
+            2000.00);
+    private final Stock appleStock = new Stock(requestAppleStockDTO);
+    private final Stock googleStock = new Stock(requestGoogleStockDTO);
     private final List<ResponseStockOwnershipDTO> storedStockPortfolio = List.of(
-            new ResponseStockOwnershipDTO(appleStock, 100, 10000.00),
-            new ResponseStockOwnershipDTO(googleStock, 200, 400000.00)
-    );
+            new ResponseStockOwnershipDTO(responseAppleStockDTO, 100, 10000.00),
+            new ResponseStockOwnershipDTO(responseGoogleStockDTO, 200, 400000.00));
 
     private final List<StockOwnership> givenStockOwnerships = List.of(
             new StockOwnership(new RequestStockOwnershipDTO(100), appleStock, validUser),
-            new StockOwnership(new RequestStockOwnershipDTO(200), googleStock, validUser)
-    );
+            new StockOwnership(new RequestStockOwnershipDTO(200), googleStock, validUser));
 
     @BeforeEach
     void setUp() {
         SecuritySecretsMock.mockStatic();
+
+        appleStock.setId("apple-id");
+        googleStock.setId("google-id");
 
         stockPositionRepository = Mockito.mock(StockOwnershipRepository.class);
         stockRepository = Mockito.mock(StockRepository.class);
@@ -76,7 +81,7 @@ public class PortfolioServiceTest {
         List<ResponseStockOwnershipDTO> stockPortfolio = portfolioService.getAuthenticatedUserStockPortfolio();
 
         for (int i = 0; i < stockPortfolio.size(); i++) {
-            assertStocksAreEqual(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
+            assertResponseStockDTOEqualsStock(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
             assertEquals(stockPortfolio.get(i).totalShares(), this.storedStockPortfolio.get(i).totalShares());
             assertEquals(stockPortfolio.get(i).positionValue(), this.storedStockPortfolio.get(i).positionValue());
         }
@@ -87,7 +92,7 @@ public class PortfolioServiceTest {
         List<ResponseStockOwnershipDTO> stockPortfolio = portfolioService.getPortfolioByUserId(validUser.getId());
 
         for (int i = 0; i < stockPortfolio.size(); i++) {
-            assertStocksAreEqual(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
+            assertResponseStockDTOEqualsStock(stockPortfolio.get(i).stock(), this.storedStockPortfolio.get(i).stock());
             assertEquals(stockPortfolio.get(i).totalShares(), this.storedStockPortfolio.get(i).totalShares());
             assertEquals(stockPortfolio.get(i).positionValue(), this.storedStockPortfolio.get(i).positionValue());
         }

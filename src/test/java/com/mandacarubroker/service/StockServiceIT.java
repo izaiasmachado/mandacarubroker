@@ -2,6 +2,7 @@ package com.mandacarubroker.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mandacarubroker.domain.stock.RequestStockDTO;
+import com.mandacarubroker.domain.stock.ResponseStockDTO;
 import com.mandacarubroker.domain.stock.Stock;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
@@ -15,8 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.mandacarubroker.domain.stock.StockUtils.assertResponseStockDTOEqualsStock;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -30,7 +31,7 @@ class StockServiceIT {
     @Autowired
     private StockService service;
 
-    private Stock stock;
+    private ResponseStockDTO stock;
     private double stockSize;
     private String stockId;
     private String invalidStockId = "dummy-stock-id";
@@ -47,7 +48,7 @@ class StockServiceIT {
     void setUp() {
         stockSize = service.getAllStocks().size();
         stock = service.getAllStocks().get(0);
-        stockId = stock.getId();
+        stockId = stock.id();
     }
 
     @AfterEach
@@ -81,29 +82,33 @@ class StockServiceIT {
 
     @Test
     void itShouldBeAbleToGetAllStocks() {
-        List<Stock> stocks = service.getAllStocks();
+        List<ResponseStockDTO> stocks = service.getAllStocks();
         assertEquals(stockSize, stocks.size());
     }
 
     @Test
     void itShouldBeAbleToGetStockById() {
-        Stock foundStock = service.getStockById(stockId).get();
-        assertStocksAreEqual(stock, foundStock);
+        Optional<ResponseStockDTO> foundStock = service.getStockById(stockId);
+        assertTrue(foundStock.isPresent());
+        assertResponseStockDTOEqualsStock(stock, foundStock.get());
     }
 
     @Test
     void itShouldRetunEmptyWhenStockIsNotFound() {
-        Optional<Stock> foundStock = service.getStockById(invalidStockId);
+        Optional<ResponseStockDTO> foundStock = service.getStockById(invalidStockId);
         assertEquals(Optional.empty(), foundStock);
     }
 
     @Test
     void itShouldBeAbleToCreateStock() {
         RequestStockDTO requestStockDTO = new RequestStockDTO(validSymbol, validCompanyName, validPrice);
-        Stock createdStock = service.createStock(requestStockDTO);
+        Optional<ResponseStockDTO> createdStock = service.createStock(requestStockDTO);
 
         assertStockWasCreated();
-        assertRequestStockDTOEqualsStock(requestStockDTO, createdStock);
+        assertTrue(createdStock.isPresent());
+        assertEquals(validSymbol, createdStock.get().symbol());
+        assertEquals(validCompanyName, createdStock.get().companyName());
+        assertEquals(validPrice, createdStock.get().price());
     }
 
     @Test
@@ -154,10 +159,13 @@ class StockServiceIT {
     @Test
     void itShouldBeAbleToUpdateStock() {
         RequestStockDTO requestStockDTO = new RequestStockDTO(validSymbol, validCompanyName, validPrice);
-        Stock updatedStock = service.updateStock(stockId, requestStockDTO).get();
+        Optional<ResponseStockDTO> updatedStock = service.updateStock(stockId, requestStockDTO);
 
-        assertRequestStockDTOEqualsStock(requestStockDTO, updatedStock);
         assertNoStockWasCreated();
+        assertTrue(updatedStock.isPresent());
+        assertEquals(validSymbol, updatedStock.get().symbol());
+        assertEquals(validCompanyName, updatedStock.get().companyName());
+        assertEquals(validPrice, updatedStock.get().price());
     }
 
     @Test
@@ -208,8 +216,7 @@ class StockServiceIT {
     @Test
     void itShouldBeAbleToDeleteStock() {
         service.deleteStock(stockId);
-        Optional<Stock> deletedStock = service.getStockById(stockId);
-
+        Optional<ResponseStockDTO> deletedStock = service.getStockById(stockId);
         assertEquals(Optional.empty(), deletedStock);
         assertStockWasDeleted();
     }

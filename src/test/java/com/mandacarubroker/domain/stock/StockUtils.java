@@ -12,4 +12,11 @@ public final class StockUtils {
         assertEquals(expectedStock.getCompanyName(), actualStock.getCompanyName());
         assertEquals(expectedStock.getPrice(), actualStock.getPrice());
     }
+
+    public static void assertResponseStockDTOEqualsStock(final ResponseStockDTO expected, final ResponseStockDTO actual) {
+        assertEquals(expected.id(), actual.id());
+        assertEquals(expected.symbol(), actual.symbol());
+        assertEquals(expected.companyName(), actual.companyName());
+        assertEquals(expected.price(), actual.price());
+    }
 }
