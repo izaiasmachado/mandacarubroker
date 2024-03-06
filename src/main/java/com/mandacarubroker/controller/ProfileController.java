@@ -4,7 +4,6 @@ import com.mandacarubroker.domain.profile.ResponseProfileDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.service.AuthService;
 import com.mandacarubroker.service.ProfileService;
-import com.mandacarubroker.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -24,11 +23,9 @@ import java.util.Optional;
 @RequestMapping("/profile")
 public class ProfileController {
     private final ProfileService profileService;
-    private final UserService userService;
 
-    public ProfileController(final ProfileService receivedProfileService, final UserService receivedUserService) {
+    public ProfileController(final ProfileService receivedProfileService) {
         this.profileService = receivedProfileService;
-        this.userService = receivedUserService;
     }
 
     @Operation(summary = "Retorna dados de um usuário", description = "Mostra dados de um usuário autenticado")
