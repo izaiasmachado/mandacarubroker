@@ -37,5 +37,4 @@ public class ProfileController {
 
         return ResponseEntity.ok(updatedProfile.get());
     }
-
 }

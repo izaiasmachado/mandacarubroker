@@ -1,6 +1,7 @@
 package com.mandacarubroker.controller;
 
 import com.mandacarubroker.domain.auth.RequestAuthUserDTO;
+import com.mandacarubroker.domain.auth.RequestUserRegisterDTO;
 import com.mandacarubroker.domain.auth.ResponseAuthUserDTO;
 import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
@@ -53,5 +54,17 @@ public class AuthController {
         User user = AuthService.getAuthenticatedUser();
         ResponseUserDTO responseUserDTO = ResponseUserDTO.fromUser(user);
         return ResponseEntity.ok(responseUserDTO);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<ResponseUserDTO> register(@Valid @RequestBody final RequestUserRegisterDTO requestAuthUserDTO) {
+        Optional<ResponseUserDTO> responseAuthUserDTO = authService.register(requestAuthUserDTO);
+
+        if (responseAuthUserDTO.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        ResponseUserDTO responseUserDTO = responseAuthUserDTO.orElseThrow();
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseUserDTO);
     }
 }
