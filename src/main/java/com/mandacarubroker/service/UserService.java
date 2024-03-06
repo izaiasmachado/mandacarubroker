@@ -63,6 +63,9 @@ public class UserService implements UserDetailsService {
     }
 
     public ResponseUserDTO createUser(final RequestUserDTO requestUserDTO) {
+        if (verifyDuplicateUsername(requestUserDTO.username())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "this username is not available");
+        }
         validateRequestDTO(requestUserDTO);
         User newUser = new User(requestUserDTO);
         User hashedPasswordUser = hashPassword(newUser);
