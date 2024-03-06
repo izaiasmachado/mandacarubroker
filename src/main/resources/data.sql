@@ -20,3 +20,10 @@ INSERT INTO users (id, email, username, password, first_name, last_name, birth_d
 VALUES
     ('b2d13c5a-3df0-4673-b3e6-49244f395ac7', 'admin@example.com', 'admin', '$2a$10$oUmo9dGdjnbdWeYlq7tsNuZo/r.pwI6T8JbEu2bp26Y5Zg7uzrKMy', 'Ademir', 'Ademilson', '2002-01-01', 777.7, 'ADMIN')
     ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO stock_ownership (id, stock_id, user_id, shares)
+VALUES
+    ('b3d13c5a-3df0-4673-b3e6-49244f395ac9', 'b2d13c5a-3df0-4673-b3e6-49244f395ac9', 'b2d13c5a-3df0-4673-b3e6-49244f395ac7', 10),
+    ('b3d13c5a-3df0-4673-b3e6-49244f395ad9', 'b2d13c5a-3df0-4673-b3e6-49244f395ad9', 'b2d13c5a-3df0-4673-b3e6-49244f395ac7', 20)
+    ON CONFLICT (id) DO NOTHING;
+

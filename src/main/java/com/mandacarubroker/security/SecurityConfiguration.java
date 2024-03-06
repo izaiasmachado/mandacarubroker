@@ -34,7 +34,9 @@ public class SecurityConfiguration {
             "/",
             "/auth/login",
             "/auth/register",
-            "/auth/me"
+            "/docs**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
     };
 
     private final AuthenticationProvider authenticationProvider;
@@ -61,7 +63,6 @@ public class SecurityConfiguration {
                 })
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }

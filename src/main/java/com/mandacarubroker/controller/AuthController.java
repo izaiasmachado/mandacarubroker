@@ -6,6 +6,10 @@ import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.service.AuthService;
 import com.mandacarubroker.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.Optional;
 
+@Tag(name = "Autenticação", description = "Operações relacionadas a autenticação do usuário")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -27,6 +32,11 @@ public class AuthController {
         this.userService = receivedUserService;
     }
 
+    @Operation(summary = "Login do usuário", description = "Realiza o login do usuário e retorna o token de autenticação")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login bem sucedido"),
+            @ApiResponse(responseCode = "401", description = "Usuário ou senha inválidos")
+    })
     @PostMapping("/login")
     public ResponseEntity<ResponseAuthUserDTO> login(@Valid @RequestBody final RequestAuthUserDTO requestAuthUserDTO) {
         Optional<ResponseAuthUserDTO> responseAuthUserDTO = authService.login(requestAuthUserDTO);
