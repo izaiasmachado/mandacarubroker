@@ -203,6 +203,7 @@ class UserControllerIT {
                 mockMvc.perform(requestBuilder).andExpect(matchStatus);
         }
 
+        @Test
         void itShouldReturnUserDataAfterSucessfulPost() throws Exception {
                 String userJsonString = objectMapper.writeValueAsString(validUserDTO);
                 System.out.println(userJsonString);
@@ -217,6 +218,7 @@ class UserControllerIT {
                 assertResponseUserDTO(validUserDTO, createdUser);
         }
 
+        @Test
         void itShouldReturnUserDataAfterSucessfulPut() throws Exception {
                 String userJsonString = objectMapper.writeValueAsString(validUserDTO);
 
