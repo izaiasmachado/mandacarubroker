@@ -4,10 +4,11 @@ import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.ResponseUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,13 +95,13 @@ public class UserService implements UserDetailsService {
 
     public UserDetails loadUserByUsername(final String username) {
         if (username == null || username.isEmpty()) {
-            throw new UsernameNotFoundException("Username is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username cannot be null or empty");
         }
 
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 
         return user;
