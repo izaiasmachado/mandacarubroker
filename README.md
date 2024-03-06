@@ -103,6 +103,13 @@ DELETE /stocks/{id}
 
 Contribuições são bem-vindas!
 
+## Equipe
+
+| <img src="https://avatars.githubusercontent.com/u/69826078?v=3&s=115"><br><strong>Íris Costa</strong> | <img src="https://avatars0.githubusercontent.com/u/47287096?v=3&s=115"><br><strong>Izaias Machado</strong> | <img src="https://avatars0.githubusercontent.com/u/43821439?v=3&s=115"><br><strong>Jonas Fortes</strong> | <img src="https://avatars0.githubusercontent.com/u/70725719?v=3&s=115"><br><strong>William Lima</strong> | <img src="https://avatars0.githubusercontent.com/u/112739407?v=3&s=115"><br><strong>Yann Lucca</strong> |
+| :---------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
+|                          [LinkedIn](https://www.linkedin.com/in/costairis/)                           |                           [LinkedIn](https://www.linkedin.com/in/izaiasmachado/)                           |                     [LinkedIn](https://www.linkedin.com/in/jonas-fortes-2138731a3/)                      |                       [LinkedIn](https://www.linkedin.com/in/william-bruno-sales/)                       |                            [LinkedIn](https://linkedin.com/in/yann-miranda)                             |
+|                                [GitHub](https://github.com/iriscoxta)                                 |                                 [GitHub](https://github.com/izaiasmachado)                                 |                                [GitHub](https://github.com/JonasFortes12)                                |                                [GitHub](https://github.com/williambrunos)                                |                                  [GitHub](https://github.com/yannluk4)                                  |
+
 ## Licença
 
 Este projeto está licenciado sob a [Licença MIT](LICENSE).
