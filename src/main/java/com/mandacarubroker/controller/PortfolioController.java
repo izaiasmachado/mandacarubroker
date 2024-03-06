@@ -40,7 +40,11 @@ public class PortfolioController {
         return portfolioService.getAuthenticatedUserStockPortfolio();
     }
 
-    @PostMapping("/{stockId}/buy")
+    @Operation(summary = "Comprar ações", description = "Compra um ou vários títulos de uma ações")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operação de compra efetuada")
+    })
+    @PostMapping("/stock/{stockId}/buy")
     public ResponseEntity<ResponseStockOwnershipDTO> buyStock(
             @PathVariable final String stockId,
             @RequestBody @Valid final RequestStockOwnershipDTO shares) {
@@ -48,7 +52,11 @@ public class PortfolioController {
         return ResponseEntity.ok(stockPosition);
     }
 
-    @PostMapping("/{stockId}/sell")
+    @Operation(summary = "Vender ações", description = "Vende um ou vários títulos de uma ação no portfolio")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operação de venda efetuada")
+    })
+    @PostMapping("/stock/{stockId}/sell")
     public ResponseEntity<ResponseStockOwnershipDTO> sellStock(
             @PathVariable final String stockId,
             @RequestBody @Valid final RequestStockOwnershipDTO shares) {
