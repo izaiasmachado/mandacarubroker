@@ -4,79 +4,17 @@
 
 O projeto Mandacaru Broker API é uma aplicação Spring Boot que fornece operações CRUD (Create, Read, Update, Delete) para gerenciar informações sobre ações (stocks).
 
-## Recursos
+## Arquitetura da Solução
 
-### Listar Todas as Ações
+![Arquitetura da solução](./docs/img/architecture.png)
 
-Retorna uma lista de todas as ações disponíveis.
+Foi utilizado um ambiente local com dois bancos instanciados por meio do `docker-compose.yml`.
 
-**Endpoint:**
+Ao realizar a abertura de um pull request, o GitHub Actions é usado para rodar uma pipeline composta por build da aplicação, SonarCloud Quality Gate, checagem de padrão de linting com CheckStyle e execução de testes unitários e de integração.
 
-```http
-GET /stocks
-```
+Passado nas checagens do pull request e feitas as revisões pelos membros da equipe, pode ser feito o merge do pull request. Novamente, é executado uma assessment de qualidade com o SonarCloud e é feita a implantação da solução com um workflow de deploy.
 
-### Obter uma Ação por ID
-
-Retorna os detalhes de uma ação específica com base no ID.
-
-**Endpoint:**
-
-```http
-GET /stocks/{id}
-```
-
-### Criar uma Nova Ação
-
-Cria uma nova ação com base nos dados fornecidos.
-
-**Endpoint:**
-
-```http
-POST /stocks
-```
-
-**Corpo da Solicitação (Request Body):**
-
-```JSON
-{
-  "symbol": "BBAS3",
-  "companyName": "Banco do Brasil SA",
-  "price": 56.97
-}
-
-```
-
-### Atualizar uma Ação por ID
-
-Atualiza os detalhes de uma ação específica com base no ID.
-
-**Endpoint:**
-
-```http
-PUT /stocks/{id}
-```
-
-**Corpo da Solicitação (Request Body):**
-
-```JSON
-{
-  "symbol": "BBAS3",
-  "companyName": "Banco do Brasil SA",
-  "price": 59.97
-}
-
-```
-
-### Excluir uma Ação por ID
-
-Exclui uma ação específica com base no ID.
-
-**Endpoint:**
-
-```http
-DELETE /stocks/{id}
-```
+Nesse sentido, o workflow de deploy faz o build da imagem docker e push para o Docker Hub. Com isso, o GitHub Actions acessa a máquina virtual e o container é implantado.
 
 ## Uso
 
