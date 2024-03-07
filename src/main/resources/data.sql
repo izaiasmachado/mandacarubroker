@@ -23,7 +23,7 @@ VALUES
 
 INSERT INTO users (id, email, username, password, first_name, last_name, birth_date, balance, role)
 VALUES
-    ('b2d13c5a-3df0-4673-b3e6-49244f395ac8', 'ricardovilela@example.com', 'ricardovilela', '$2a$10$ie7t8c9SAdzLaBwoJN.zm.J68w3z3F3EHsdqulPSPoLrgwIPa7hQa', 'ricardo', 'vilela', '2002-01-01', 100000000.22, 'ADMIN')
+    ('b2d13c5a-3df0-4673-b3e6-49244f395ac8', 'ricardovilela@example.com', 'ricardovilela', '$2a$10$ie7t8c9SAdzLaBwoJN.zm.J68w3z3F3EHsdqulPSPoLrgwIPa7hQa', 'Ricardo', 'Vilela', '2002-01-01', 100000000.22, 'ADMIN')
     ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO stock_ownership (id, stock_id, user_id, shares)
