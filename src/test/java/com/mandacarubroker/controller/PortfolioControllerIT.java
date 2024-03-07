@@ -64,8 +64,8 @@ public class PortfolioControllerIT {
     @BeforeEach
     void setUp() {
         validRequestAuthUserDTO = new RequestAuthUserDTO(
-                "admin",
-                "admin"
+                "ricardovilela",
+                "ricardovilela"
         );
         stockToOperate = stockService.getAllStocks().get(0);
 
