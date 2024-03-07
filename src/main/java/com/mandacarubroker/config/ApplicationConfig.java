@@ -11,9 +11,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
@@ -32,20 +29,8 @@ public class ApplicationConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-
-        List<String> allowedOrigins = Arrays.asList(
-                "http://localhost:3000",
-                "https://mandacarubroker.com.br",
-                "https://www.mandacarubroker.com.br",
-                "https://test-front.mandacarubroker.com.br"
-        );
-
-        List<String> allowedMethods = Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS",  "HEAD", "TRACE", "CONNECT"
-        );
-
-        allowedOrigins.forEach(config::addAllowedOrigin);
-        allowedMethods.forEach(config::addAllowedMethod);
+        config.addAllowedOrigin("*");
+        config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
