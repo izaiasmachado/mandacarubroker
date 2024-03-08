@@ -29,7 +29,8 @@ public class ProfileService {
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getBirthDate()
+                user.getBirthDate(),
+                user.getBalance()
         );
     }
 

@@ -13,6 +13,7 @@ public record RequestUserRegisterDTO(
         @NotBlank(message = "Username cannot be blank")
         String username,
         @Size(min = MINIMUM_PASSWORD_LENGTH, message = "Password must be at least 8 characters long")
+        @NotBlank(message = "Password cannot be blank")
         String password,
         String firstName,
         String lastName,

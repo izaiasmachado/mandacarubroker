@@ -9,7 +9,8 @@ public record ResponseProfileDTO(
         String username,
         String firstName,
         String lastName,
-        LocalDate birthDate
+        LocalDate birthDate,
+        Double balance
 ) {
     public static ResponseProfileDTO fromUser(final User user) {
         return new ResponseProfileDTO(
@@ -17,7 +18,8 @@ public record ResponseProfileDTO(
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getBirthDate()
+                user.getBirthDate(),
+                user.getBalance()
         );
     }
 }
