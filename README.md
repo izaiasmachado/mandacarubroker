@@ -1,8 +1,10 @@
-# Mandacaru Broker - API
+<p align="center">
+  <img width="400px" src="docs/img/mandacarubroker-logo.webp">
+</p>
 
-## Descrição
+<h1 align="center">Mandacaru Broker - API</h1>
 
-O projeto Mandacaru Broker API é uma aplicação Spring Boot que visa simular o comportamento de um Home Broker de Ações. 
+O projeto Mandacaru Broker API é uma aplicação Spring Boot que visa simular o comportamento de um Home Broker de Ações.
 
 Para saber mais, acesse a documentação do nosso ambiente de **produção**, que será utilizado no DEMO DAY: [nossa documentação Swagger - ambiente de produção](https://api.mandacarubroker.com.br/docs).
 
