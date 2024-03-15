@@ -27,44 +27,44 @@ jobs:
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api
 
-  deploy-test:
-    name: Deploy test environment to Azure VM
-    runs-on: ubuntu-latest
-    needs: push-to-registry
-    environment:
-      name: azure-test
-      url: https://test-api.mandacarubroker.com.br/docs
-    steps:
-      - name: Set up Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  # deploy-test:
+  #   name: Deploy test environment to Azure VM
+  #   runs-on: ubuntu-latest
+  #   needs: push-to-registry
+  #   environment:
+  #     name: azure-test
+  #     url: https://test-api.mandacarubroker.com.br/docs
+  #   steps:
+  #     - name: Set up Azure CLI
+  #       uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Save SSH private key to file
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-          chmod 400 private_key
+  #     - name: Save SSH private key to file
+  #       run: |
+  #         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+  #         chmod 400 private_key
 
-      - name: Deploy to Azure VM and run Docker
-        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ vars.AZURE_VM_USER }}@${{ vars.AZURE_VM_IP }} 'sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api || true && sudo docker stop ${{ vars.CONTAINER_NAME }} || true && docker rm ${{ vars.CONTAINER_NAME }} || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name ${{ vars.CONTAINER_NAME }} -e MANDACARU_POSTGRES_HOST=${{ secrets.MANDACARU_POSTGRES_HOST }} -e MANDACARU_POSTGRES_PORT=${{ secrets.MANDACARU_POSTGRES_PORT }} -e MANDACARU_POSTGRES_DB=${{ secrets.MANDACARU_POSTGRES_DB }} -e MANDACARU_POSTGRES_USER=${{ secrets.MANDACARU_POSTGRES_USER }} -e MANDACARU_POSTGRES_PASSWORD=${{ secrets.MANDACARU_POSTGRES_PASSWORD }} -e MANDACARU_SQL_INIT_MODE=${{ vars.MANDACARU_SQL_INIT_MODE }} -e MANDACARU_JWT_SECRET=${{ secrets.MANDACARU_JWT_SECRET }} -e MANDACARU_API_PORT=${{ vars.MANDACARU_API_PORT }} -p ${{ vars.MANDACARU_API_PORT }}:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api'
+  #     - name: Deploy to Azure VM and run Docker
+  #       run: ssh -o StrictHostKeyChecking=no -i private_key ${{ vars.AZURE_VM_USER }}@${{ vars.AZURE_VM_IP }} 'sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api || true && sudo docker stop ${{ vars.CONTAINER_NAME }} || true && docker rm ${{ vars.CONTAINER_NAME }} || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name ${{ vars.CONTAINER_NAME }} -e MANDACARU_POSTGRES_HOST=${{ secrets.MANDACARU_POSTGRES_HOST }} -e MANDACARU_POSTGRES_PORT=${{ secrets.MANDACARU_POSTGRES_PORT }} -e MANDACARU_POSTGRES_DB=${{ secrets.MANDACARU_POSTGRES_DB }} -e MANDACARU_POSTGRES_USER=${{ secrets.MANDACARU_POSTGRES_USER }} -e MANDACARU_POSTGRES_PASSWORD=${{ secrets.MANDACARU_POSTGRES_PASSWORD }} -e MANDACARU_SQL_INIT_MODE=${{ vars.MANDACARU_SQL_INIT_MODE }} -e MANDACARU_JWT_SECRET=${{ secrets.MANDACARU_JWT_SECRET }} -e MANDACARU_API_PORT=${{ vars.MANDACARU_API_PORT }} -p ${{ vars.MANDACARU_API_PORT }}:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api'
 
-  deploy-production:
-    name: Deploy production environment to Azure VM
-    runs-on: ubuntu-latest
-    needs: push-to-registry
-    environment:
-      name: azure-production
-      url: https://api.mandacarubroker.com.br/docs
-    steps:
-      - name: Set up Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  # deploy-production:
+  #   name: Deploy production environment to Azure VM
+  #   runs-on: ubuntu-latest
+  #   needs: push-to-registry
+  #   environment:
+  #     name: azure-production
+  #     url: https://api.mandacarubroker.com.br/docs
+  #   steps:
+  #     - name: Set up Azure CLI
+  #       uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Save SSH private key to file
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-          chmod 400 private_key
+  #     - name: Save SSH private key to file
+  #       run: |
+  #         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+  #         chmod 400 private_key
 
-      - name: Deploy to Azure VM and run Docker
-        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ vars.AZURE_VM_USER }}@${{ vars.AZURE_VM_IP }} 'sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api || true && sudo docker stop ${{ vars.CONTAINER_NAME }} || true && docker rm ${{ vars.CONTAINER_NAME }} || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name ${{ vars.CONTAINER_NAME }} -e MANDACARU_POSTGRES_HOST=${{ secrets.MANDACARU_POSTGRES_HOST }} -e MANDACARU_POSTGRES_PORT=${{ secrets.MANDACARU_POSTGRES_PORT }} -e MANDACARU_POSTGRES_DB=${{ secrets.MANDACARU_POSTGRES_DB }} -e MANDACARU_POSTGRES_USER=${{ secrets.MANDACARU_POSTGRES_USER }} -e MANDACARU_POSTGRES_PASSWORD=${{ secrets.MANDACARU_POSTGRES_PASSWORD }} -e MANDACARU_SQL_INIT_MODE=${{ vars.MANDACARU_SQL_INIT_MODE }} -e MANDACARU_JWT_SECRET=${{ secrets.MANDACARU_JWT_SECRET }} -e MANDACARU_API_PORT=${{ vars.MANDACARU_API_PORT }} -p ${{ vars.MANDACARU_API_PORT }}:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api'
+  #     - name: Deploy to Azure VM and run Docker
+  #       run: ssh -o StrictHostKeyChecking=no -i private_key ${{ vars.AZURE_VM_USER }}@${{ vars.AZURE_VM_IP }} 'sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api || true && sudo docker stop ${{ vars.CONTAINER_NAME }} || true && docker rm ${{ vars.CONTAINER_NAME }} || true && docker run --log-opt labels=applications,environment --restart unless-stopped --name ${{ vars.CONTAINER_NAME }} -e MANDACARU_POSTGRES_HOST=${{ secrets.MANDACARU_POSTGRES_HOST }} -e MANDACARU_POSTGRES_PORT=${{ secrets.MANDACARU_POSTGRES_PORT }} -e MANDACARU_POSTGRES_DB=${{ secrets.MANDACARU_POSTGRES_DB }} -e MANDACARU_POSTGRES_USER=${{ secrets.MANDACARU_POSTGRES_USER }} -e MANDACARU_POSTGRES_PASSWORD=${{ secrets.MANDACARU_POSTGRES_PASSWORD }} -e MANDACARU_SQL_INIT_MODE=${{ vars.MANDACARU_SQL_INIT_MODE }} -e MANDACARU_JWT_SECRET=${{ secrets.MANDACARU_JWT_SECRET }} -e MANDACARU_API_PORT=${{ vars.MANDACARU_API_PORT }} -p ${{ vars.MANDACARU_API_PORT }}:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/mandacarubroker-api'
