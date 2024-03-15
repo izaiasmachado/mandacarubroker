@@ -1,8 +1,8 @@
-<p align="center">
-  <img width="400px" src="docs/img/mandacarubroker-logo.webp">
-</p>
+<h1 align="center"><img width="400px" src="docs/img/mandacarubroker-logo.webp"></h1>
 
-<h1 align="center">Mandacaru Broker - API</h1>
+<p align="center">
+  <strong>Projeto vencedor do <a href="https://mandacaru.dev">Mandacaru.dev</a> no Módulo Jandaia</strong>
+</p>
 
 O projeto Mandacaru Broker API é uma aplicação Spring Boot que visa simular o comportamento de um Home Broker de Ações.
 
