@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Service
 public class PortfolioService {
-    private final StockOwnershipRepository stockPositionRepository;
+    private final StockOwnershipRepository stockOwnershipRepository;
     private final StockService stockService;
     private final UserRepository userRepository;
     private final StockRepository stockRepository;
@@ -28,7 +28,7 @@ public class PortfolioService {
             final StockService receivedStockService,
             final StockRepository receivedStockRepository,
             final UserRepository recievedUserRepository) {
-        this.stockPositionRepository = receivedStockPositionRepository;
+        this.stockOwnershipRepository = receivedStockPositionRepository;
         this.stockService = receivedStockService;
         this.stockRepository = receivedStockRepository;
         this.userRepository = recievedUserRepository;
@@ -47,15 +47,30 @@ public class PortfolioService {
             return Optional.empty();
         }
 
-        StockOwnership stockPosition = stockPositionRepository.findByUserIdAndStockId(userId, stockId);
+        StockOwnership stockPosition = stockOwnershipRepository.findByUserIdAndStockId(userId, stockId);
 
         if (stockPosition == null) {
             return Optional.of(ResponseStockOwnershipDTO.fromStock(stock));
         }
 
         ResponseStockOwnershipDTO responseStockOwnershipDTO = ResponseStockOwnershipDTO
-                .fromStockPosition(stockPosition);
+                .fromStockOwnership(stockPosition);
         return Optional.of(responseStockOwnershipDTO);
+    }
+
+    private StockOwnership getStockOwnership(
+            final User user,
+            final Stock stock
+    ) {
+        StockOwnership stockOwnership = stockOwnershipRepository.findByUserIdAndStockId(user.getId(), stock.getId());
+
+        if (stockOwnership == null) {
+            RequestStockOwnershipDTO requestStockOwnershipDTO = new RequestStockOwnershipDTO(0);
+            StockOwnership newStockOwnership = new StockOwnership(requestStockOwnershipDTO, stock, user);
+            return newStockOwnership;
+        }
+
+        return stockOwnership;
     }
 
     public List<ResponseStockOwnershipDTO> getAuthenticatedUserStockPortfolio() {
@@ -65,10 +80,10 @@ public class PortfolioService {
     }
 
     public List<ResponseStockOwnershipDTO> getPortfolioByUserId(final String userId) {
-        List<StockOwnership> stockPositions = stockPositionRepository.findByUserId(userId);
+        List<StockOwnership> stockPositions = stockOwnershipRepository.findByUserId(userId);
 
         return stockPositions.stream()
-                .map(ResponseStockOwnershipDTO::fromStockPosition)
+                .map(ResponseStockOwnershipDTO::fromStockOwnership)
                 .toList();
     }
 
@@ -76,22 +91,13 @@ public class PortfolioService {
         User user = AuthService.getAuthenticatedUser();
         String userId = user.getId();
 
-        StockOwnership stockPosition = stockPositionRepository.findByUserIdAndStockId(userId, stockId);
+        StockOwnership stockPosition = stockOwnershipRepository.findByUserIdAndStockId(userId, stockId);
 
         if (stockPosition == null) {
             return Optional.empty();
         }
 
-        return Optional.of(ResponseStockOwnershipDTO.fromStockPosition(stockPosition));
-    }
-
-    private StockOwnership createStockPosition(
-            final RequestStockOwnershipDTO requestStockOwnershipDTO,
-            final ResponseStockDTO receivedStockDTO,
-            final User user) {
-        Stock stock = stockRepository.findById(receivedStockDTO.id()).orElse(null);
-        StockOwnership newStockPosition = new StockOwnership(requestStockOwnershipDTO, stock, user);
-        return stockPositionRepository.save(newStockPosition);
+        return Optional.of(ResponseStockOwnershipDTO.fromStockOwnership(stockPosition));
     }
 
     private Optional<StockOwnership> updateStockPositionShares(
@@ -99,62 +105,35 @@ public class PortfolioService {
             final String stockId,
             final RequestStockOwnershipDTO requestStockOwnershipDTO) {
 
-        StockOwnership stockPosition = stockPositionRepository.findByUserIdAndStockId(userId, stockId);
+        StockOwnership stockPosition = stockOwnershipRepository.findByUserIdAndStockId(userId, stockId);
         stockPosition.setShares(requestStockOwnershipDTO.shares());
-        return Optional.of(stockPositionRepository.save(stockPosition));
-    }
-
-    private ResponseStockOwnershipDTO addStockPositionInPortfolio(
-            final ResponseStockDTO stock,
-            final User user,
-            final RequestStockOwnershipDTO shares) {
-
-        Optional<ResponseStockOwnershipDTO> existentStockPosition = getStockPositionByUserIdAndStockId(stock.id());
-
-        if (existentStockPosition.isPresent()) {
-            Optional<StockOwnership> updatedStockPosition = updateStockPositionShares(
-                    user.getId(),
-                    stock.id(),
-                    new RequestStockOwnershipDTO(
-                            existentStockPosition.get().totalShares()
-                                    + shares.shares()));
-
-            if (updatedStockPosition.isEmpty()) {
-                throw new IllegalStateException("Error on update shares in portfolio");
-            }
-            return ResponseStockOwnershipDTO.fromStockPosition(
-                    updatedStockPosition.get());
-        }
-
-        return ResponseStockOwnershipDTO.fromStockPosition(
-                createStockPosition(
-                        new RequestStockOwnershipDTO(shares.shares()),
-                        stock,
-                        user));
+        return Optional.of(stockOwnershipRepository.save(stockPosition));
     }
 
     private void removeStockPositionFromPortfolio(final String userId, final String stockId) {
-        StockOwnership stockPosition = stockPositionRepository.findByUserIdAndStockId(userId, stockId);
+        StockOwnership stockPosition = stockOwnershipRepository.findByUserIdAndStockId(userId, stockId);
         String stockPositionId = stockPosition.getId();
-        stockPositionRepository.deleteById(stockPositionId);
+        stockOwnershipRepository.deleteById(stockPositionId);
     }
 
-    public ResponseStockOwnershipDTO buyStock(final String stockId, final RequestStockOwnershipDTO shares) {
+    public ResponseStockOwnershipDTO buyStock(final String stockId, final RequestStockOwnershipDTO requestStockOwnershipDTO) {
         User user = AuthService.getAuthenticatedUser();
-        Optional<ResponseStockDTO> stock = stockService.getStockById(stockId);
+        Optional<Stock> stock = stockRepository.findById(stockId);
 
         if (stock.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Stock not found");
         }
-        double userBalance = user.getBalance();
-        double stockBoughtPrice = stock.get().price() * shares.shares();
-        if (userBalance < stockBoughtPrice) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Insufficient balance");
-        }
-        ResponseStockOwnershipDTO boughtStockPosition = addStockPositionInPortfolio(stock.get(), user, shares);
-        user.setBalance(userBalance - stockBoughtPrice);
+
+        int buyingShares = requestStockOwnershipDTO.shares();
+        double buyingPrice = stock.get().getPrice() * buyingShares;
+        user.withdraw(buyingPrice);
         userRepository.save(user);
-        return boughtStockPosition;
+
+        StockOwnership stockOwnership = getStockOwnership(user, stock.get());
+        stockOwnership.buyShares(buyingShares);
+        StockOwnership updatedStockOwnership = stockOwnershipRepository.save(stockOwnership);
+
+        return ResponseStockOwnershipDTO.fromStockOwnership(updatedStockOwnership);
     }
 
     public ResponseStockOwnershipDTO sellStock(final String stockId, final RequestStockOwnershipDTO shares) {
@@ -191,6 +170,6 @@ public class PortfolioService {
         user.setBalance(userBalance + stocksSoldPrice);
         userRepository.save(user);
 
-        return ResponseStockOwnershipDTO.fromStockPosition(updatedStockPosition.get());
+        return ResponseStockOwnershipDTO.fromStockOwnership(updatedStockPosition.get());
     }
 }

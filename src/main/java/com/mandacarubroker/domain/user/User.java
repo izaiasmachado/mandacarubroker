@@ -59,17 +59,17 @@ public class User implements UserDetails {
 
     public void deposit(final double amount) {
         if (amount <= 0) {
-            throw new IllegalArgumentException("The deposit amount must be greater than zero.");
+            throw new IllegalArgumentException("The amount must be greater than zero.");
         }
         this.balance += amount;
     }
 
     public void withdraw(final double amount) {
         if (amount <= 0) {
-            throw new IllegalArgumentException("The withdrawal amount must be greater than zero.");
+            throw new IllegalArgumentException("The amount must be greater than zero.");
         }
         if (amount > balance) {
-            throw new IllegalArgumentException("Insufficient balance for withdrawal.");
+            throw new IllegalArgumentException("Insufficient balance.");
         }
         this.balance -= amount;
     }
