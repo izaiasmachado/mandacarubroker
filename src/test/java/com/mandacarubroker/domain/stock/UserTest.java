@@ -4,6 +4,7 @@ import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.mandacarubroker.exceptions.IllegalArgumentException;
 
 import java.time.LocalDate;
 

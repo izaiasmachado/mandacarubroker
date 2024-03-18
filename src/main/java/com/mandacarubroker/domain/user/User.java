@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.mandacarubroker.exceptions.IllegalArgumentException;
 
 import java.time.LocalDate;
 import java.util.Collection;
