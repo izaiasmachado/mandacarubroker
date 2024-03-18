@@ -52,8 +52,7 @@ public class PortfolioService {
 
         if (stockOwnership == null) {
             RequestStockOwnershipDTO requestStockOwnershipDTO = new RequestStockOwnershipDTO(0);
-            StockOwnership newStockOwnership = new StockOwnership(requestStockOwnershipDTO, stock, user);
-            return newStockOwnership;
+            return new StockOwnership(requestStockOwnershipDTO, stock, user);
         }
 
         return stockOwnership;
@@ -65,8 +64,7 @@ public class PortfolioService {
             return stockOwnership;
         }
 
-        StockOwnership updatedStockOwnership = stockOwnershipRepository.save(stockOwnership);
-        return updatedStockOwnership;
+        return stockOwnershipRepository.save(stockOwnership);
     }
 
     public List<ResponseStockOwnershipDTO> getAuthenticatedUserStockPortfolio() {
