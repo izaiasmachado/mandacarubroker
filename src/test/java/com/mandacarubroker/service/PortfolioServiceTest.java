@@ -27,7 +27,6 @@ import static org.mockito.Mockito.mockStatic;
 public class PortfolioServiceTest {
         @MockBean
         private StockOwnershipRepository stockPositionRepository;
-        private StockService stockService;
         private UserRepository userRepository;
 
         @MockBean
@@ -74,12 +73,10 @@ public class PortfolioServiceTest {
                 stockRepository = Mockito.mock(StockRepository.class);
                 Mockito.when(stockPositionRepository.findByUserId(validUser.getId())).thenReturn(givenStockOwnerships);
 
-                stockService = Mockito.mock(StockService.class);
                 userRepository = Mockito.mock(UserRepository.class);
 
                 portfolioService = new PortfolioService(
                                 stockPositionRepository,
-                                stockService,
                                 stockRepository,
                                 userRepository);
         }
