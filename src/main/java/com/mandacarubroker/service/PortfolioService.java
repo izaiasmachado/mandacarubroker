@@ -40,21 +40,14 @@ public class PortfolioService {
     }
 
     public Optional<ResponseStockOwnershipDTO> getStockOwnershipByStockId(final User user, final String stockId) {
-        String userId = user.getId();
-        Stock stock = stockRepository.findById(stockId).orElse(null);
+        Optional<Stock> stock = stockRepository.findById(stockId);
 
-        if (stock == null) {
+        if (stock.isEmpty()) {
             return Optional.empty();
         }
 
-        StockOwnership stockPosition = stockOwnershipRepository.findByUserIdAndStockId(userId, stockId);
-
-        if (stockPosition == null) {
-            return Optional.of(ResponseStockOwnershipDTO.fromStock(stock));
-        }
-
-        ResponseStockOwnershipDTO responseStockOwnershipDTO = ResponseStockOwnershipDTO
-                .fromStockOwnership(stockPosition);
+        StockOwnership stockOwnership = getStockOwnership(user, stock.get());
+        ResponseStockOwnershipDTO responseStockOwnershipDTO = ResponseStockOwnershipDTO.fromStockOwnership(stockOwnership);
         return Optional.of(responseStockOwnershipDTO);
     }
 
