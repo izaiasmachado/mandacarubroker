@@ -122,25 +122,22 @@ public class PortfolioServiceTest {
                 Mockito.when(stockOwnershipRepository.findByUserIdAndStockId(validUser.getId(), appleStock.getId()))
                         .thenReturn(appleStockOwnership);
 
-                Optional<ResponseStockOwnershipDTO> stockOwnership = portfolioService
-                        .getStockOwnershipByStockId(validUser, appleStock.getId());
+                ResponseStockOwnershipDTO stockOwnership = portfolioService.getStockOwnershipByStockId(validUser, appleStock.getId());
 
-                assertTrue(stockOwnership.isPresent());
-                assertResponseStockDTOEqualsStock(stockOwnership.get().stock(), responseAppleStockDTO);
-                assertEquals(stockOwnership.get().totalShares(), appleStockOwnership.getShares());
-                assertEquals(stockOwnership.get().positionValue(), appleStockOwnership.getTotalValue());
+                assertResponseStockDTOEqualsStock(stockOwnership.stock(), responseAppleStockDTO);
+                assertEquals(stockOwnership.totalShares(), appleStockOwnership.getShares());
+                assertEquals(stockOwnership.positionValue(), appleStockOwnership.getTotalValue());
         }
 
         @Test
         void itShouldReturnUserStockOwnershipWithZeroShares() {
                 Mockito.when(stockRepository.findById(googleStock.getId())).thenReturn(Optional.of(googleStock));
 
-                Optional<ResponseStockOwnershipDTO> stockOwnership = portfolioService.getStockOwnershipByStockId(validUser, googleStock.getId());
+                ResponseStockOwnershipDTO stockOwnership = portfolioService.getStockOwnershipByStockId(validUser, googleStock.getId());
 
-                assertTrue(stockOwnership.isPresent());
-                assertResponseStockDTOEqualsStock(stockOwnership.get().stock(), responseGoogleStockDTO);
-                assertEquals(stockOwnership.get().totalShares(), 0);
-                assertEquals(stockOwnership.get().positionValue(), 0.00);
+                assertResponseStockDTOEqualsStock(stockOwnership.stock(), responseGoogleStockDTO);
+                assertEquals(stockOwnership.totalShares(), 0);
+                assertEquals(stockOwnership.positionValue(), 0.00);
         }
 
         @Test

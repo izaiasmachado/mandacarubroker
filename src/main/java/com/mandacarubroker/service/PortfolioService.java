@@ -26,16 +26,15 @@ public class PortfolioService {
         this.userRepository = recievedUserRepository;
     }
 
-    public Optional<ResponseStockOwnershipDTO> getAuthenticatedUserStockOwnershipByStockId(final String stockId) {
+    public ResponseStockOwnershipDTO getAuthenticatedUserStockOwnershipByStockId(final String stockId) {
         User user = AuthService.getAuthenticatedUser();
         return getStockOwnershipByStockId(user, stockId);
     }
 
-    public Optional<ResponseStockOwnershipDTO> getStockOwnershipByStockId(final User user, final String stockId) {
+    public ResponseStockOwnershipDTO getStockOwnershipByStockId(final User user, final String stockId) {
         Stock stock = getStock(stockId);
         StockOwnership stockOwnership = getStockOwnership(user, stock);
-        ResponseStockOwnershipDTO responseStockOwnershipDTO = ResponseStockOwnershipDTO.fromStockOwnership(stockOwnership);
-        return Optional.of(responseStockOwnershipDTO);
+        return ResponseStockOwnershipDTO.fromStockOwnership(stockOwnership);
     }
 
     private Stock getStock(final String stockId) {

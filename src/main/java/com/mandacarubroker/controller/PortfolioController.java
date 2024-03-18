@@ -13,13 +13,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Tag(name = "Portfólio de Ativos", description = "Operações relacionadas com portfólios de ativos. User role: user")
 @RestController
@@ -47,7 +44,8 @@ public class PortfolioController {
     @PostMapping("/stock/{stockId}/buy")
     public ResponseEntity<ResponseStockOwnershipDTO> buyStock(
             @PathVariable final String stockId,
-            @RequestBody @Valid final RequestStockOwnershipDTO shares) {
+            @RequestBody @Valid final RequestStockOwnershipDTO shares
+    ) {
         ResponseStockOwnershipDTO stockPosition = portfolioService.buyStock(stockId, shares);
         return ResponseEntity.ok(stockPosition);
     }
@@ -59,7 +57,8 @@ public class PortfolioController {
     @PostMapping("/stock/{stockId}/sell")
     public ResponseEntity<ResponseStockOwnershipDTO> sellStock(
             @PathVariable final String stockId,
-            @RequestBody @Valid final RequestStockOwnershipDTO shares) {
+            @RequestBody @Valid final RequestStockOwnershipDTO shares
+    ) {
         ResponseStockOwnershipDTO stockPosition = portfolioService.sellStock(stockId, shares);
         return ResponseEntity.ok(stockPosition);
     }
@@ -70,14 +69,8 @@ public class PortfolioController {
             @ApiResponse(responseCode = "404", description = "Ação não encontrada")
     })
     @GetMapping("/stock/{stockId}")
-    public ResponseStockOwnershipDTO getStockPositionById(@PathVariable final String stockId) {
-        Optional<ResponseStockOwnershipDTO> stockPosition = portfolioService
-                .getAuthenticatedUserStockOwnershipByStockId(stockId);
-
-        if (stockPosition.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Stock ownership not found");
-        }
-
-        return stockPosition.get();
+    public ResponseEntity<ResponseStockOwnershipDTO> getStockPositionById(@PathVariable final String stockId) {
+        ResponseStockOwnershipDTO stockPosition = portfolioService.getAuthenticatedUserStockOwnershipByStockId(stockId);
+        return ResponseEntity.ok(stockPosition);
     }
 }
