@@ -136,8 +136,8 @@ public class PortfolioServiceTest {
                 ResponseStockOwnershipDTO stockOwnership = portfolioService.getStockOwnershipByStockId(validUser, googleStock.getId());
 
                 assertResponseStockDTOEqualsStock(stockOwnership.stock(), responseGoogleStockDTO);
-                assertEquals(stockOwnership.totalShares(), 0);
-                assertEquals(stockOwnership.positionValue(), 0.00);
+                assertEquals(0, stockOwnership.totalShares());
+                assertEquals(0.00, stockOwnership.positionValue());
         }
 
         @Test
