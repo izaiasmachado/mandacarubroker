@@ -11,6 +11,7 @@ import com.mandacarubroker.domain.stock.StockRepository;
 import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
+import com.mandacarubroker.exceptions.NotFoundException;
 import com.mandacarubroker.security.SecuritySecretsMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mandacarubroker.domain.stock.StockUtils.assertResponseStockDTOEqualsStock;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mockStatic;
 
 public class PortfolioServiceTest {
@@ -147,8 +147,8 @@ public class PortfolioServiceTest {
         void itShouldReturnEmptyWhenStockIsNotFound() {
                 Mockito.when(stockRepository.findById("invalid-stock-id")).thenReturn(Optional.empty());
 
-                Optional<ResponseStockOwnershipDTO> stockOwnership = portfolioService.getStockOwnershipByStockId(validUser, "invalid-stock-id");
-
-                assertTrue(stockOwnership.isEmpty());
+                assertThrows(NotFoundException.class, () -> {
+                        portfolioService.getStockOwnershipByStockId(validUser, "invalid-stock-id");
+                });
         }
 }

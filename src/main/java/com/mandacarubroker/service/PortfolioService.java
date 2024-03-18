@@ -8,9 +8,8 @@ import com.mandacarubroker.domain.stock.Stock;
 import com.mandacarubroker.domain.stock.StockRepository;
 import com.mandacarubroker.domain.user.User;
 import com.mandacarubroker.domain.user.UserRepository;
-import org.springframework.http.HttpStatus;
+import com.mandacarubroker.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,15 +32,20 @@ public class PortfolioService {
     }
 
     public Optional<ResponseStockOwnershipDTO> getStockOwnershipByStockId(final User user, final String stockId) {
+        Stock stock = getStock(stockId);
+        StockOwnership stockOwnership = getStockOwnership(user, stock);
+        ResponseStockOwnershipDTO responseStockOwnershipDTO = ResponseStockOwnershipDTO.fromStockOwnership(stockOwnership);
+        return Optional.of(responseStockOwnershipDTO);
+    }
+
+    private Stock getStock(final String stockId) {
         Optional<Stock> stock = stockRepository.findById(stockId);
 
         if (stock.isEmpty()) {
-            return Optional.empty();
+            throw new NotFoundException("Stock not found");
         }
 
-        StockOwnership stockOwnership = getStockOwnership(user, stock.get());
-        ResponseStockOwnershipDTO responseStockOwnershipDTO = ResponseStockOwnershipDTO.fromStockOwnership(stockOwnership);
-        return Optional.of(responseStockOwnershipDTO);
+        return stock.get();
     }
 
     private StockOwnership getStockOwnership(
@@ -83,18 +87,14 @@ public class PortfolioService {
 
     public ResponseStockOwnershipDTO buyStock(final String stockId, final RequestStockOwnershipDTO requestStockOwnershipDTO) {
         User user = AuthService.getAuthenticatedUser();
-        Optional<Stock> stock = stockRepository.findById(stockId);
-
-        if (stock.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Stock not found");
-        }
+        Stock stock = getStock(stockId);
 
         int buyingShares = requestStockOwnershipDTO.shares();
-        double buyingPrice = stock.get().getPrice() * buyingShares;
+        double buyingPrice = stock.getPrice() * buyingShares;
         user.withdraw(buyingPrice);
         userRepository.save(user);
 
-        StockOwnership stockOwnership = getStockOwnership(user, stock.get());
+        StockOwnership stockOwnership = getStockOwnership(user, stock);
         stockOwnership.buyShares(buyingShares);
         StockOwnership updatedStockOwnership = updateStockOwnership(stockOwnership);
 
@@ -103,18 +103,14 @@ public class PortfolioService {
 
     public ResponseStockOwnershipDTO sellStock(final String stockId, final RequestStockOwnershipDTO requestStockOwnershipDTO) {
         User user = AuthService.getAuthenticatedUser();
-        Optional<Stock> stock = stockRepository.findById(stockId);
-
-        if (stock.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Stock not found");
-        }
+        Stock stock = getStock(stockId);
 
         int sellingShares = requestStockOwnershipDTO.shares();
-        StockOwnership stockOwnership = getStockOwnership(user, stock.get());
+        StockOwnership stockOwnership = getStockOwnership(user, stock);
         stockOwnership.sellShares(sellingShares);
         StockOwnership updatedStockOwnership = updateStockOwnership(stockOwnership);
 
-        double sellingPrice = stock.get().getPrice() * sellingShares;
+        double sellingPrice = stock.getPrice() * sellingShares;
         user.deposit(sellingPrice);
         userRepository.save(user);
 
