@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import com.mandacarubroker.exceptions.IllegalArgumentException;
 
 @Table(name = "stock_ownership")
 @Entity(name = "stock_ownership")

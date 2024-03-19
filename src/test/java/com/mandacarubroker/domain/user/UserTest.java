@@ -1,4 +1,4 @@
-package com.mandacarubroker.domain.stock;
+package com.mandacarubroker.domain.user;
 
 import com.mandacarubroker.domain.user.RequestUserDTO;
 import com.mandacarubroker.domain.user.User;
