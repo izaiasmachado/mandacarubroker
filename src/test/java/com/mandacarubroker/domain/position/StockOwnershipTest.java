@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class StockOwnershipTest {
+class StockOwnershipTest {
     private final RequestUserDTO requestUserDTO = new RequestUserDTO(
             "marcosloiola@yahoo.com",
             "Marcos22",
