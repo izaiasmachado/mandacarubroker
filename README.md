@@ -6,27 +6,30 @@
 
 O projeto Mandacaru Broker API é uma aplicação Spring Boot que visa simular o comportamento de um Home Broker de Ações.
 
-## Arquitetura da Solução e Fluxo de Trabalho
+## Arquitetura da Solução
 
 ![Arquitetura da solução](./docs/img/architecture.png)
 
-Foi utilizado um ambiente local com dois bancos instanciados por meio do `docker-compose.yml`.
+## Fluxo de Trabalho
+
+Para ambiente de desenvolvimento, foi utilizado um ambiente local com dois bancos instanciados por meio do `docker-compose.yml`.
+
+Ao realizar a abertura de um pull request, o GitHub Actions é usado para rodar uma pipeline composta por build da aplicação, SonarCloud Quality Gate, checagem de padrão de linting com CheckStyle e execução de testes unitários e de integração.
+
 
 <p align="center">
   <img src="docs/img/ci.gif" width="700px" />
 </p>
 
-Ao realizar a abertura de um pull request, o GitHub Actions é usado para rodar uma pipeline composta por build da aplicação, SonarCloud Quality Gate, checagem de padrão de linting com CheckStyle e execução de testes unitários e de integração.
+Passado nas checagens do pull request e feitas as revisões pelos membros da equipe, pode ser feito o merge do pull request. Novamente, é executado uma assessment de qualidade com o SonarCloud e é feita a implantação da aplicação utilizando ferramentas em nuvem (**AZURE**) e um workflow de deploy.
+
+Nesse sentido, o workflow de deploy faz o build da imagem docker e push para o Docker Hub. Com isso, o GitHub Actions acessa a máquina virtual na Azure e dois containers são implantados.
 
 <p align="center">
   <img src="docs/img/cd.png" width="700px" />
 </p>
 
-Passado nas checagens do pull request e feitas as revisões pelos membros da equipe, pode ser feito o merge do pull request. Novamente, é executado uma assessment de qualidade com o SonarCloud e é feita a implantação da aplicação utilizando ferramentas em nuvem (**AZURE**) e um workflow de deploy.
-
-Nesse sentido, o workflow de deploy faz o build da imagem docker e push para o Docker Hub. Com isso, o GitHub Actions acessa a máquina virtual na azure e dois containers são implantados.
-
-O primeiro container é referente ao nosso ambiente de **produção**, que foi utilizado para desmonstração no DEMO DAY (09/03/2024): [nossa documentação Swagger - ambiente de produção](https://api.mandacarubroker.com.br/docs).
+O primeiro container é referente ao nosso ambiente de **produção**, que foi utilizado para desmonstração no DEMO DAY (09/03/2024): com  [nossa documentação Swagger - ambiente de produção](https://api.mandacarubroker.com.br/docs).
 
 Já o outro container foi do nosso ambiente de **testes**, utilizado para a avaliação do projeto. Esse ambiente foi utilizado como uma alternativa de rodar localmente a aplicação ou usar o ambiente de produção: [nossa documentação swagger - ambiente de teste](https://test-api.mandacarubroker.com.br/swagger-ui/index.html).
 
