@@ -7,13 +7,13 @@ public record ResponseStockOwnershipDTO(
         ResponseStockDTO stock,
         int totalShares,
         double positionValue) {
-    public static ResponseStockOwnershipDTO fromStockPosition(final StockOwnership stockPosition) {
-        final Stock stock = stockPosition.getStock();
+    public static ResponseStockOwnershipDTO fromStockOwnership(final StockOwnership stockOwnership) {
+        final Stock stock = stockOwnership.getStock();
 
         return new ResponseStockOwnershipDTO(
                 ResponseStockDTO.fromStock(stock),
-                stockPosition.getShares(),
-                stockPosition.getTotalValue());
+                stockOwnership.getShares(),
+                stockOwnership.getTotalValue());
     }
 
     public static ResponseStockOwnershipDTO fromStock(final Stock stock) {

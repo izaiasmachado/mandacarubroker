@@ -1,16 +1,15 @@
-package com.mandacarubroker.domain.stock;
+package com.mandacarubroker.domain.user;
 
-import com.mandacarubroker.domain.user.RequestUserDTO;
-import com.mandacarubroker.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.mandacarubroker.exceptions.IllegalArgumentException;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UserTest {
+class UserTest {
     private User user;
     private final RequestUserDTO requestUserDTO = new RequestUserDTO(
             "marcosloiola@yahoo.com",

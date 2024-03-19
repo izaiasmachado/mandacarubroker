@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import com.mandacarubroker.exceptions.IllegalArgumentException;
 
 @Table(name = "stock_ownership")
 @Entity(name = "stock_ownership")
@@ -41,5 +42,25 @@ public class StockOwnership {
 
     public Stock getStock() {
         return stock;
+    }
+
+    public void buyShares(final int sharesToBuy) {
+        if (sharesToBuy < 0) {
+            throw new IllegalArgumentException("Invalid number of shares");
+        }
+
+        shares += sharesToBuy;
+    }
+
+    public void sellShares(final int sharesToSell) {
+        if (sharesToSell < 0) {
+            throw new IllegalArgumentException("Invalid number of shares");
+        }
+
+        if (shares < sharesToSell) {
+            throw new IllegalArgumentException("Insufficient shares");
+        }
+
+        shares -= sharesToSell;
     }
 }
